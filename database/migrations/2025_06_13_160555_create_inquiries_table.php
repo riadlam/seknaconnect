@@ -10,12 +10,17 @@ return new class extends Migration
      * Run the migrations.
      */
     public function up(): void
-    {
-        Schema::create('inquiries', function (Blueprint $table) {
-            $table->id();
-            $table->timestamps();
-        });
-    }
+{
+    Schema::create('inquiries', function (Blueprint $table) {
+        $table->id();
+        $table->foreignId('project_id')->constrained()->onDelete('cascade');
+        $table->string('name');   // name of the person who inquired
+        $table->string('email');
+        $table->text('message');
+        $table->timestamps();
+    });
+}
+
 
     /**
      * Reverse the migrations.
