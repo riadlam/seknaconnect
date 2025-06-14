@@ -94,25 +94,57 @@
           
           <!-- Auth Buttons -->
           <div class="ml-4 flex items-center space-x-4">
-            <router-link 
-              to="/login" 
-              class="px-4 py-2 text-sm font-medium text-gray-700 hover:text-purple-600 transition-all duration-300 relative group"
-            >
-              <span class="relative z-10">Sign In</span>
-              <span class="absolute inset-0 bg-gradient-to-r from-purple-50 to-transparent opacity-0 group-hover:opacity-100 rounded-md transition-opacity duration-300"></span>
-            </router-link>
-            <router-link 
-              to="/register" 
-              class="relative px-6 py-2.5 text-sm font-medium text-white bg-gradient-to-r from-purple-600 to-indigo-600 rounded-full hover:from-purple-700 hover:to-indigo-700 transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl hover:shadow-purple-200 overflow-hidden group"
-            >
-              <span class="absolute inset-0 bg-gradient-to-r from-white/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></span>
-              <span class="relative z-10 flex items-center">
-                Get Started
-                <svg class="ml-1.5 w-4 h-4 transform group-hover:translate-x-1 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
-                </svg>
-              </span>
-            </router-link>
+            <template v-if="!isAuthenticated">
+              <router-link 
+                to="/auth" 
+                class="px-4 py-2 text-sm font-medium text-gray-700 hover:text-purple-600 transition-all duration-300 relative group"
+              >
+                <span class="relative z-10">Sign In</span>
+                <span class="absolute inset-0 bg-gradient-to-r from-purple-50 to-transparent opacity-0 group-hover:opacity-100 rounded-md transition-opacity duration-300"></span>
+              </router-link>
+              <router-link 
+                to="/auth" 
+                class="relative px-6 py-2.5 text-sm font-medium text-white bg-gradient-to-r from-purple-600 to-indigo-600 rounded-full hover:from-purple-700 hover:to-indigo-700 transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl hover:shadow-purple-200 overflow-hidden group"
+              >
+                <span class="absolute inset-0 bg-gradient-to-r from-white/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></span>
+                <span class="relative z-10 flex items-center">
+                  Get Started
+                  <svg class="ml-1.5 w-4 h-4 transform group-hover:translate-x-1 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
+                  </svg>
+                </span>
+              </router-link>
+            </template>
+            <template v-else>
+              <!-- Simple profile dropdown with logout -->
+              <div class="relative ml-3">
+                <button 
+                  @click="toggleUserMenu" 
+                  type="button" 
+                  class="flex items-center justify-center h-8 w-8 rounded-full bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-medium focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500"
+                  aria-label="User menu"
+                >
+                  {{ userInitial }}
+                </button>
+                
+                <!-- Simple dropdown with just logout -->
+                <div 
+                  v-if="showUserMenu" 
+                  class="profile-dropdown origin-top-right absolute right-0 mt-2 w-32 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none z-50"
+                  @click.stop
+                >
+                  <div class="py-1" role="menu">
+                    <button
+                      @click="handleLogout"
+                      class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                      role="menuitem"
+                    >
+                      Logout
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </template>
           </div>
         </div>
 
@@ -172,14 +204,14 @@
         <div class="pt-4 pb-3 border-t border-gray-200">
           <div class="mt-3 space-y-1">
             <router-link
-              to="/login"
+              to="/auth"
               @click="isOpen = false"
               class="block px-4 py-2 text-base font-medium text-gray-500 hover:text-gray-800 hover:bg-gray-100"
             >
               Sign in
             </router-link>
             <router-link
-              to="/register"
+              to="/auth"
               @click="isOpen = false"
               class="block px-4 py-2 text-base font-medium text-gray-500 hover:text-gray-800 hover:bg-gray-100"
             >
@@ -193,13 +225,16 @@
 </template>
 
 <script>
-import { ref, onMounted, onUnmounted, nextTick } from 'vue';
-import { useRoute } from 'vue-router';
+import { ref, onMounted, onUnmounted, nextTick, computed, watch } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
+import { useStore } from 'vuex';
 
 export default {
   name: 'Navbar',
   setup() {
     const route = useRoute();
+    const router = useRouter();
+    const store = useStore();
     const isOpen = ref(false);
     const isSearchFocused = ref(false);
     const searchQuery = ref('');
@@ -207,6 +242,64 @@ export default {
     const lastScrollY = ref(0);
     const navHidden = ref(false);
     const showMobileSearch = ref(false);
+    const showUserMenu = ref(false);
+    
+    // Computed properties
+    const isAuthenticated = computed(() => store.getters['auth/isAuthenticated']);
+    const userInitial = computed(() => {
+      const user = store.state.auth.user;
+      if (!user || !user.name) return 'U';
+      return user.name
+        .split(' ')
+        .map(n => n[0])
+        .join('')
+        .toUpperCase()
+        .substring(0, 2);
+    });
+    const userRole = computed(() => store.state.auth.user?.role || '');
+    
+    // Toggle user menu
+    const toggleUserMenu = () => {
+      showUserMenu.value = !showUserMenu.value;
+    };
+    
+    // Close user menu when clicking outside
+    const handleClickOutside = (event) => {
+      const profileButton = event.target.closest('button[aria-label="User menu"]');
+      const dropdownMenu = event.target.closest('.profile-dropdown');
+      
+      if (!profileButton && !dropdownMenu) {
+        showUserMenu.value = false;
+      }
+    };
+    
+    // Handle logout
+    const handleLogout = async () => {
+      try {
+        await store.dispatch('auth/logout');
+        showUserMenu.value = false;
+        router.push('/');
+      } catch (error) {
+        console.error('Logout error:', error);
+      }
+    };
+    
+    // Close menu when route changes
+    const closeAllMenus = () => {
+      isOpen.value = false;
+      showUserMenu.value = false;
+    };
+    
+    // Add event listener for outside clicks
+    onMounted(() => {
+      document.addEventListener('click', handleClickOutside);
+      router.afterEach(closeAllMenus);
+    });
+    
+    // Clean up event listener
+    onUnmounted(() => {
+      document.removeEventListener('click', handleClickOutside);
+    });
 
     const navItems = [
       { name: 'Home', href: '/' },
@@ -277,7 +370,13 @@ export default {
       closeMenu,
       clearSearch,
       toggleSearch,
-      navHidden
+      navHidden,
+      isAuthenticated,
+      userInitial,
+      userRole,
+      showUserMenu,
+      toggleUserMenu,
+      handleLogout
     };
   }
 }
