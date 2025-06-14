@@ -9,6 +9,7 @@ import HomePage from './views/HomePage.vue';
 import Contact from './views/Contact.vue';
 import About from './views/About.vue';
 import Properties from './views/Properties.vue';
+import PropertyDetails from './views/PropertyDetails.vue';
 import Auth from './views/Auth.vue';
 
 // Set base URL for API requests
@@ -32,6 +33,7 @@ axios.interceptors.request.use(
 const routes = [
   { path: '/', component: HomePage, name: 'home' },
   { path: '/properties', component: Properties, name: 'properties' },
+  { path: '/properties/:id', component: PropertyDetails, name: 'property-details', props: true },
   { path: '/about', component: About, name: 'about' },
   { path: '/contact', component: Contact, name: 'contact' },
   { path: '/auth', component: Auth, name: 'auth' },

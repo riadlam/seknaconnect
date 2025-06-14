@@ -1,6 +1,7 @@
 <template>
   <div
-    class="group relative bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-1 h-full w-full flex flex-col"
+    class="group relative bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-1 h-full w-full flex flex-col cursor-pointer"
+    @click="viewPropertyDetails"
   >
     <!-- Image Gallery -->
     <div class="relative w-full aspect-[4/3] overflow-hidden">
@@ -135,6 +136,7 @@
 
 <script>
 import { ref, computed, onMounted } from 'vue';
+import { useRouter } from 'vue-router';
 
 export default {
   name: 'PropertyCard',
@@ -157,9 +159,15 @@ export default {
     }
   },
   setup(props) {
-    const currentImageIndex = ref(0);
+    const router = useRouter();
     const isHovered = ref(false);
-    const isFavorited = ref(false);
+    const currentImageIndex = ref(0);
+    const showShareOptions = ref(false);
+    const isFavorite = ref(false);
+
+    const viewPropertyDetails = () => {
+      router.push({ name: 'property-details', params: { id: props.property.id } });
+    };
     
     // Ensure property.images is always an array with at least one image
     const propertyImages = computed(() => {
@@ -184,7 +192,7 @@ export default {
     
     const toggleFavorite = (e) => {
       e.stopPropagation();
-      isFavorited.value = !isFavorited.value;
+      isFavorite.value = !isFavorite.value;
       // Here you would typically make an API call to update the favorite status
     };
     
@@ -208,10 +216,11 @@ export default {
       currentImageIndex,
       currentImage,
       isHovered,
-      isFavorited,
+      isFavorite,
       nextImage,
       prevImage,
-      toggleFavorite
+      toggleFavorite,
+      viewPropertyDetails,
     };
   }
 }
