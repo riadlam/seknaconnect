@@ -32,32 +32,65 @@ const actions = {
   async register({ commit }, userData) {
     commit('authRequest');
     try {
+      console.log('Attempting registration with:', userData);
+      
       const response = await axios.post('/api/register', {
         name: userData.name,
         email: userData.email,
         phone: userData.phone,
         password: userData.password,
         password_confirmation: userData.password_confirmation,
-        user_type: 'client',
         role: userData.isSeller ? 'professional' : 'public'
+      }, {
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json'
+        }
       });
       
-      const { user, token } = response.data;
-      localStorage.setItem('token', token);
-      localStorage.setItem('user', JSON.stringify(user));
-      axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+      console.log('Registration response:', response.data);
       
-      commit('authSuccess', { user, token });
-      return { success: true };
+      if (response.data && response.data.token) {
+        const { user, token } = response.data;
+        
+        // Store token and user in localStorage by default
+        localStorage.setItem('token', token);
+        localStorage.setItem('user', JSON.stringify(user));
+        
+        // Set auth header
+        axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+        
+        commit('authSuccess', { user, token });
+        console.log('Registration successful, user:', user);
+        return { success: true };
+      } else {
+        const errorMsg = response.data?.message || 'Invalid response from server';
+        console.error('Registration failed:', errorMsg);
+        commit('authError', errorMsg);
+        return { success: false, error: errorMsg };
+      }
     } catch (error) {
       let errorMessage = 'Registration failed. Please try again.';
-      if (error.response && error.response.data.errors) {
-        // Format validation errors
-        const errors = Object.values(error.response.data.errors).flat();
-        errorMessage = errors.join(' ');
-      } else if (error.response && error.response.data.message) {
-        errorMessage = error.response.data.message;
+      
+      if (error.response) {
+        // Handle validation errors
+        if (error.response.data && error.response.data.errors) {
+          const errors = Object.values(error.response.data.errors).flat();
+          errorMessage = errors.join(' ');
+        } else if (error.response.data && error.response.data.message) {
+          errorMessage = error.response.data.message;
+        } else if (error.response.status === 422) {
+          errorMessage = 'Validation error. Please check your input.';
+        } else if (error.response.status >= 500) {
+          errorMessage = 'Server error. Please try again later.';
+        }
+      } else if (error.request) {
+        errorMessage = 'No response from server. Please check your connection.';
+      } else {
+        errorMessage = error.message || 'An error occurred during registration';
       }
+      
+      console.error('Registration error:', error);
       commit('authError', errorMessage);
       return { success: false, error: errorMessage };
     }
