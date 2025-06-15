@@ -1,8 +1,8 @@
 <template>
   <div id="app">
-    <Navbar />
+    <Navbar v-if="!isAdminRoute" />
     
-    <main class="min-h-screen bg-gray-50">
+    <main :class="['min-h-screen', isAdminRoute ? 'bg-white' : 'bg-gray-50']">
       <router-view v-slot="{ Component }">
         <transition name="fade" mode="out-in">
           <component :is="Component" />
@@ -10,7 +10,7 @@
       </router-view>
     </main>
 
-    <footer class="bg-gray-800 text-white py-8">
+    <footer v-if="!isAdminRoute" class="bg-gray-800 text-white py-8">
       <div class="max-w-7xl mx-auto px-4">
         <div class="md:flex md:justify-between">
           <div class="mb-8 md:mb-0">
@@ -45,9 +45,22 @@
 </template>
 
 <script>
+import { computed } from 'vue';
+import { useRoute } from 'vue-router';
 import Navbar from './components/Navbar.vue';
 
 export default {
+  setup() {
+    const route = useRoute();
+    
+    const isAdminRoute = computed(() => {
+      return route.path.startsWith('/admin');
+    });
+
+    return {
+      isAdminRoute
+    };
+  },
   name: 'App',
   components: {
     Navbar

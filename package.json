@@ -25,6 +25,7 @@
         "vue-loader": "^17.3.0"
     },
     "dependencies": {
+        "@heroicons/vue": "^2.2.0",
         "@inertiajs/vue3": "^1.0.15",
         "pinia": "^3.0.3",
         "vue": "^3.3.0",
