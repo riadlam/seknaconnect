@@ -13,7 +13,8 @@ class ProjectImageController extends Controller
     public function store(Request $request, $projectId)
     {
         $request->validate([
-            'image' => 'required|image|max:2048'
+            'image' => 'required|image|mimes:jpeg,png,jpg,gif,webp|max:5120', // 5MB max
+            'caption' => 'nullable|string|max:255'
         ]);
 
         $project = Project::findOrFail($projectId);
@@ -23,14 +24,34 @@ class ProjectImageController extends Controller
             return response()->json(['error' => 'Unauthorized'], 403);
         }
 
-        $path = $request->file('image')->store('public/project-images');
+        try {
+            $file = $request->file('image');
+            
+            // Generate a unique filename with timestamp
+            $filename = uniqid() . '.' . $file->getClientOriginalExtension();
+            
+            // Store the file in the public disk
+            $path = $file->storeAs('project-images', $filename, 'public');
+            
+            // Create the image record
+            $image = ProjectImage::create([
+                'project_id' => $projectId,
+                'image_path' => '/storage/' . $path,
+                'caption' => $request->input('caption')
+            ]);
 
-        $image = ProjectImage::create([
-            'project_id' => $projectId,
-            'image_path' => Storage::url($path)
-        ]);
-
-        return response()->json($image, 201);
+            return response()->json([
+                'message' => 'Image uploaded successfully',
+                'data' => $image
+            ], 201);
+            
+        } catch (\Exception $e) {
+            \Log::error('Image upload error: ' . $e->getMessage());
+            return response()->json([
+                'error' => 'Failed to upload image',
+                'message' => $e->getMessage()
+            ], 500);
+        }
     }
 
     public function destroy(Request $request, $id)

@@ -83,13 +83,43 @@
             class="flex transition-transform duration-500 ease-out"
             :style="{ transform: `translateX(-${currentSlide * (100 / slidesToShow)}%)` }"
           >
-            <div
-              v-for="(property, index) in filteredProperties"
-              :key="property.id"
-              class="flex-shrink-0 px-2 w-[calc(100%-1rem)] sm:w-1/2 lg:w-1/4"
-            >
-              <PropertyCard :property="property" class="h-full w-full" />
+            <div v-if="isLoading" class="flex w-full justify-center py-12">
+              <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-purple-500"></div>
             </div>
+            <template v-else-if="error">
+              <div class="w-full text-center py-8 text-red-500">
+                {{ error }}
+              </div>
+            </template>
+            <template v-else-if="filteredProperties.length === 0">
+              <div class="w-full text-center py-8 text-gray-500">
+                No properties found matching your criteria.
+              </div>
+            </template>
+            <template v-else>
+              <div
+                v-for="(property, index) in filteredProperties"
+                :key="property.id"
+                class="flex-shrink-0 px-2 w-[calc(100%-1rem)] sm:w-1/2 lg:w-1/4"
+              >
+                <PropertyCard 
+                  :property="{
+                    id: property.id,
+                    title: property.name,
+                    location: property.location,
+                    price: property.formattedPrice,
+                    image: property.mainImage.url,
+                    alt: property.name,
+                    area: property.formattedArea,
+                    type: property.housingType,
+                    featured: property.featured,
+                    isNew: property.isNew
+                  }" 
+                  class="h-full w-full cursor-pointer hover:shadow-lg transition-shadow duration-300"
+                  @click="viewProperty(property)"
+                />
+              </div>
+            </template>
           </div>
         </div>
         
@@ -123,7 +153,10 @@
 </template>
 
 <script>
-import { ref, computed, onMounted, onBeforeUnmount } from 'vue';
+import { ref, computed, watch, onMounted, onBeforeUnmount } from 'vue';
+import { useRouter } from 'vue-router';
+import api from '../../../services/api';
+import Project from '../../../models/Project';
 import PropertyCard from './PropertyCard.vue';
 
 export default {
@@ -131,19 +164,75 @@ export default {
   components: {
     PropertyCard
   },
-  props: {
-    properties: {
-      type: Array,
-      required: true,
-      default: () => []
-    }
-  },
-  setup(props) {
+  setup() {
+    const router = useRouter();
     const slider = ref(null);
     const currentSlide = ref(0);
     const searchQuery = ref('');
     const activeFilter = ref('all');
     const slidesToShow = ref(4);
+    const projects = ref([]);
+    const isLoading = ref(true);
+    const error = ref(null);
+
+    // Fetch projects from API
+    const fetchProjects = async () => {
+      console.log('⏳ Fetching all projects...');
+      try {
+        isLoading.value = true;
+        error.value = null;
+        
+        // Get all projects
+        const response = await api.getProjects(1, 100);
+        console.log('✅ Projects API Response:', response);
+        
+        // Handle error response
+        if (response.error) {
+          console.error('❌ API Error:', response.error);
+          error.value = response.error;
+          projects.value = [];
+          return;
+        }
+        
+        // Extract projects array from response
+        const projectsData = Array.isArray(response) 
+          ? response 
+          : (response.data || []);
+        
+        console.log('📊 Projects data to process:', projectsData);
+        
+        if (projectsData.length > 0) {
+          const projectInstances = projectsData.map(project => {
+            try {
+              return new Project(project);
+            } catch (e) {
+              console.error('Error creating Project instance:', e, 'Project data:', project);
+              return null;
+            }
+          }).filter(Boolean);
+          
+          console.log('🏠 Successfully processed projects:', projectInstances.length);
+          projects.value = projectInstances;
+        } else {
+          console.warn('⚠️ No projects found in the response');
+          projects.value = [];
+        }
+      } catch (err) {
+        console.error('❌ Error fetching projects:', err);
+        error.value = 'Failed to load properties. Please try again later.';
+        projects.value = [];
+      } finally {
+        isLoading.value = false;
+        console.log('🏁 Finished loading projects. Loading state:', isLoading.value);
+      }
+    };
+
+    // Navigate to property details
+    const viewProperty = (property) => {
+      if (property.id) {
+        router.push({ name: 'property-details', params: { id: property.id } });
+      }
+    };
     
     // Update slides to show based on viewport width
     const updateSlidesToShow = () => {
@@ -167,37 +256,10 @@ export default {
       { id: 'new', label: 'New Listings' },
     ];
     
-    // Filter properties based on search and active filter
+    // Return all properties without filtering
     const filteredProperties = computed(() => {
-      let result = [...props.properties];
-      
-      // Apply search filter
-      if (searchQuery.value) {
-        const query = searchQuery.value.toLowerCase();
-        result = result.filter(property => 
-          property.title.toLowerCase().includes(query) ||
-          property.location.toLowerCase().includes(query) ||
-          property.type.toLowerCase().includes(query)
-        );
-      }
-      
-      // Apply category filter
-      if (activeFilter.value !== 'all') {
-        if (activeFilter.value === 'featured') {
-          result = result.filter(property => property.featured);
-        } else if (activeFilter.value === 'new') {
-          // Assuming new listings are less than 7 days old
-          const oneWeekAgo = new Date();
-          oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
-          result = result.filter(property => new Date(property.listedDate) > oneWeekAgo);
-        } else {
-          result = result.filter(property => 
-            property.type.toLowerCase() === activeFilter.value.toLowerCase()
-          );
-        }
-      }
-      
-      return result;
+      console.log('📦 Returning all projects:', projects.value);
+      return [...projects.value]; // Return a copy of all projects
     });
     
     // Navigation functions
@@ -239,10 +301,23 @@ export default {
     };
     
     // Lifecycle hooks
+    // Watch for changes in filtered properties
+    watch(filteredProperties, (newVal) => {
+      console.log('🔄 Filtered properties updated:', newVal);
+      // Reset to first slide when filters change
+      currentSlide.value = 0;
+    }, { immediate: true });
+
     onMounted(() => {
+      console.log('🚀 Component mounted, initializing...');
       updateSlidesToShow();
       window.addEventListener('resize', handleResize);
-      startSlideShow();
+      fetchProjects().then(() => {
+        console.log('🏠 Projects loaded, starting slideshow...');
+        startSlideShow();
+      }).catch(err => {
+        console.error('❌ Failed to initialize component:', err);
+      });
     });
     
     onBeforeUnmount(() => {
@@ -255,11 +330,14 @@ export default {
       currentSlide,
       searchQuery,
       activeFilter,
-      slidesToShow,
       propertyFilters,
       filteredProperties,
+      slidesToShow,
       scrollSlider,
       goToSlide,
+      viewProperty,
+      isLoading,
+      error,
       startSlideShow,
       stopSlideShow
     };

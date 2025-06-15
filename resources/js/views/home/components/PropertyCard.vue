@@ -8,12 +8,13 @@
       <!-- Main Image -->
       <div class="relative w-full h-full">
         <img
-          :src="currentImage"
-          :alt="property.title"
+          :src="property.image"
+          :alt="property.alt || 'Property image'"
           class="w-full h-full object-cover object-center transition-transform duration-700 ease-in-out"
           :class="{ 'scale-105': isHovered }"
           @mouseenter="isHovered = true"
           @mouseleave="isHovered = false"
+          @error="handleImageError"
         />
         
         <!-- Navigation Dots -->
@@ -67,6 +68,9 @@
           <h3 class="text-lg sm:text-xl font-semibold text-gray-900 group-hover:text-purple-700 transition-colors line-clamp-1">
             {{ property.title }}
           </h3>
+          <p class="text-sm text-gray-500 mt-1">
+            {{ property.type }}
+          </p>
           <div class="flex items-center text-sm mt-1 text-gray-600 flex-wrap gap-1">
             <svg class="w-4 h-4 text-amber-400" fill="currentColor" viewBox="0 0 20 20">
               <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
@@ -82,8 +86,7 @@
         </div>
         <div class="text-right">
           <p class="text-xl sm:text-2xl font-bold text-purple-700">
-            ${{ property.price.toLocaleString() }}
-            <span v-if="property.pricePer" class="text-sm font-normal text-gray-500">/{{ property.pricePer }}</span>
+            {{ property.price }}
           </p>
           <p v-if="property.originalPrice" class="text-sm text-gray-400 line-through">
             ${{ property.originalPrice.toLocaleString() }}
@@ -97,19 +100,19 @@
           <svg class="w-5 h-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
           </svg>
-          <span>{{ property.bedrooms }} Beds</span>
+          <span>{{ property.bedrooms || 'N/A' }} Beds</span>
         </div>
         <div class="flex flex-col items-center gap-1 hover:bg-gray-50 p-2 rounded-lg">
           <svg class="w-5 h-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
           </svg>
-          <span>{{ property.bathrooms }} Baths</span>
+          <span>{{ property.bathrooms || 'N/A' }} Baths</span>
         </div>
         <div class="flex flex-col items-center gap-1 hover:bg-gray-50 p-2 rounded-lg">
           <svg class="w-5 h-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h.5A2.5 2.5 0 0022 5.5v-1.6a1 1 0 00-.293-.707l-1.4-1.4A1 1 0 0019.4 2H4.6a1 1 0 00-.707.293l-1.4 1.4A1 1 0 002 4.6V18a2 2 0 002 2h3m8-12h.01M3 21h18m-7-6h.01" />
           </svg>
-          <span>{{ property.area }} m²</span>
+          <span>{{ property.area || 'N/A' }}</span>
         </div>
       </div>
 
@@ -145,16 +148,18 @@ export default {
       type: Object,
       required: true,
       default: () => ({
-        images: [],
-        title: '',
-        location: '',
-        price: 0,
+        id: null,
+        title: 'No Title',
+        location: 'Location not specified',
+        price: 'Price on request',
+        image: 'https://via.placeholder.com/600x400?text=No+Image',
+        alt: 'Property image',
+        area: 'N/A',
+        type: 'Property',
         bedrooms: 0,
         bathrooms: 0,
-        area: 0,
-        type: 'For Sale',
         featured: false,
-        tag: ''
+        isNew: false
       })
     }
   },
@@ -166,28 +171,14 @@ export default {
     const isFavorite = ref(false);
 
     const viewPropertyDetails = () => {
-      router.push({ name: 'property-details', params: { id: props.property.id } });
-    };
-    
-    // Ensure property.images is always an array with at least one image
-    const propertyImages = computed(() => {
-      if (props.property.images && props.property.images.length > 0) {
-        return props.property.images;
+      if (props.property.id) {
+        router.push({ name: 'property-details', params: { id: props.property.id } });
       }
-      // Fallback to the single image or a placeholder
-      return [props.property.imageUrl || 'https://images.unsplash.com/photo-1564013799919-ab600027ffc6?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80'];
-    });
-    
-    const currentImage = computed(() => {
-      return propertyImages.value[currentImageIndex.value] || propertyImages.value[0];
-    });
-    
-    const nextImage = () => {
-      currentImageIndex.value = (currentImageIndex.value + 1) % propertyImages.value.length;
     };
     
-    const prevImage = () => {
-      currentImageIndex.value = (currentImageIndex.value - 1 + propertyImages.value.length) % propertyImages.value.length;
+    const handleImageError = (e) => {
+      // If image fails to load, show a placeholder
+      e.target.src = 'https://via.placeholder.com/600x400?text=Image+Not+Available';
     };
     
     const toggleFavorite = (e) => {
@@ -200,7 +191,7 @@ export default {
     let rotationInterval;
     
     onMounted(() => {
-      if (propertyImages.value.length > 1) {
+      if (props.property.images?.length > 1) {
         rotationInterval = setInterval(() => {
           if (isHovered.value) return; // Pause on hover
           nextImage();
@@ -213,14 +204,12 @@ export default {
     });
     
     return {
-      currentImageIndex,
-      currentImage,
       isHovered,
+      showShareOptions,
       isFavorite,
-      nextImage,
-      prevImage,
-      toggleFavorite,
       viewPropertyDetails,
+      handleImageError,
+      toggleFavorite
     };
   }
 }

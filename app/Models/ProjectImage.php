@@ -9,7 +9,7 @@ class ProjectImage extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['project_id', 'image_path'];
+    protected $fillable = ['project_id', 'image_path', 'caption'];
 
     // 🔁 Relationship
     public function project()
