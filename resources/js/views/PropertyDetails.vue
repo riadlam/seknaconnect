@@ -80,7 +80,7 @@
             <div class="lg:col-span-2">
               <!-- Title and Price -->
               <div class="border-b border-gray-200 pb-6">
-                <h1 class="text-3xl font-bold text-gray-900">{{ property.title }}</h1>
+                <h1 class="text-3xl font-bold text-gray-900">{{ property.name }}</h1>
                 <div class="mt-2 flex items-center">
                   <span class="text-2xl font-semibold text-purple-700">{{ formattedPrice }}</span>
                   <span v-if="property.pricePer" class="ml-2 text-gray-500">/ {{ property.pricePer }}</span>
@@ -90,21 +90,37 @@
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                   </svg>
-                  <span>{{ property.address }}</span>
+                  <span>{{ property.location || 'Location not specified' }}</span>
                 </div>
               </div>
   
               <!-- Highlights -->
               <div class="py-6 border-b border-gray-200">
-                <h2 class="text-lg font-medium text-gray-900 mb-4">Property Highlights</h2>
+                <h2 class="text-lg font-medium text-gray-900 mb-4">Property Details</h2>
                 <div class="grid grid-cols-2 gap-4">
-                  <div v-for="(feature, index) in property.highlights" :key="index" class="flex items-center">
-                    <div class="flex-shrink-0 h-6 w-6 text-purple-600">
-                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-                      </svg>
-                    </div>
-                    <span class="ml-2 text-gray-700">{{ feature }}</span>
+                  <div class="flex items-center">
+                    <svg class="h-5 w-5 text-green-500 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                    </svg>
+                    <span class="text-gray-600">{{ property.housingType || 'N/A' }}</span>
+                  </div>
+                  <div class="flex items-center">
+                    <svg class="h-5 w-5 text-green-500 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                    </svg>
+                    <span class="text-gray-600">{{ property.surfaceArea }} m²</span>
+                  </div>
+                  <div class="flex items-center">
+                    <svg class="h-5 w-5 text-green-500 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                    </svg>
+                    <span class="text-gray-600">Delivery: {{ property.deliveryDate || 'N/A' }}</span>
+                  </div>
+                  <div class="flex items-center">
+                    <svg class="h-5 w-5 text-green-500 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <span class="text-gray-600">Posted: {{ new Date(property.createdAt).toLocaleDateString() }}</span>
                   </div>
                 </div>
               </div>
@@ -112,7 +128,7 @@
               <!-- Description -->
               <div class="py-6 border-b border-gray-200">
                 <h2 class="text-lg font-medium text-gray-900 mb-4">Description</h2>
-                <p class="text-gray-700 leading-relaxed">{{ property.description }}</p>
+                <p class="text-gray-600 whitespace-pre-line">{{ property.description || 'No description available.' }}</p>
               </div>
   
               <!-- Features -->
@@ -138,99 +154,91 @@
                   <h3 class="text-xl font-semibold">Interested in this property?</h3>
                   <p class="mt-1 text-purple-100">Contact the seller for more information</p>
                 </div>
-                
-                <form @submit.prevent="submitInquiry" class="p-6">
-                  <div class="space-y-4">
+                <div class="p-6">
+                  <form @submit.prevent="submitInquiry" class="space-y-4">
                     <div>
-                      <label for="name" class="block text-sm font-medium text-gray-700">Full Name</label>
+                      <label for="name" class="block text-sm font-medium text-gray-700">Name</label>
                       <input 
                         type="text" 
                         id="name" 
-                        v-model="inquiry.name"
-                        required 
+                        v-model="inquiryForm.name"
+                        required
                         class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500 sm:text-sm"
                         placeholder="Your name"
                       >
                     </div>
-                    
                     <div>
                       <label for="email" class="block text-sm font-medium text-gray-700">Email</label>
                       <input 
                         type="email" 
                         id="email" 
-                        v-model="inquiry.email"
+                        v-model="inquiryForm.email"
                         required
                         class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500 sm:text-sm"
                         placeholder="your@email.com"
                       >
                     </div>
-                    
                     <div>
-                      <label for="phone" class="block text-sm font-medium text-gray-700">Phone Number</label>
+                      <label for="phone" class="block text-sm font-medium text-gray-700">Phone (optional)</label>
                       <input 
                         type="tel" 
                         id="phone" 
-                        v-model="inquiry.phone"
+                        v-model="inquiryForm.phone"
                         class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500 sm:text-sm"
                         placeholder="+212 6XX-XXXXXX"
                       >
                     </div>
-                    
                     <div>
                       <label for="message" class="block text-sm font-medium text-gray-700">Message</label>
                       <textarea 
                         id="message" 
-                        v-model="inquiry.message"
+                        v-model="inquiryForm.message"
                         rows="4"
                         required
                         class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500 sm:text-sm"
-                        placeholder="I'm interested in this property. Please provide more details."
+                        placeholder="I'm interested in this property..."
                       ></textarea>
                     </div>
-                    
                     <button 
                       type="submit" 
                       :disabled="isSubmitting"
-                      class="w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 disabled:opacity-70 disabled:cursor-not-allowed transition-all duration-200"
+                      class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       <span v-if="!isSubmitting">Send Message</span>
                       <span v-else>Sending...</span>
                     </button>
+                  </form>
+                  <div v-if="submissionSuccess" class="mt-4 p-3 bg-green-100 text-green-700 rounded-md text-sm">
+                    Your message has been sent successfully!
                   </div>
-                </form>
-                
-                <div class="bg-gray-50 px-6 py-4 border-t border-gray-100">
-                  <div class="flex items-center">
-                    <div class="flex-shrink-0">
-                      <img 
-                        class="h-10 w-10 rounded-full" 
-                        :src="property.agent.avatar || 'https://ui-avatars.com/api/?name=' + property.agent.name" 
-                        :alt="property.agent.name"
-                      >
-                    </div>
-                    <div class="ml-4">
-                      <p class="text-sm font-medium text-gray-900">{{ property.agent.name }}</p>
-                      <p class="text-sm text-purple-600">
-                        <a :href="'tel:' + property.agent.phone" class="hover:underline">{{ property.agent.phone }}</a>
-                      </p>
-                    </div>
+                  
+                  <!-- Contact Information -->
+                  <div v-if="property?.user" class="mt-6 pt-4 border-t border-gray-100">
+                    <h4 class="text-sm font-medium text-gray-900 mb-2">Contact Information</h4>
+                    <p class="text-sm font-medium text-gray-900">{{ property.user.name }}</p>
+                    <p class="text-sm text-purple-600 mt-1">
+                      <a :href="'mailto:' + property.user.email" class="hover:underline">{{ property.user.email }}</a>
+                    </p>
+                    <p v-if="property.user.phone" class="text-sm text-purple-600 mt-1">
+                      <a :href="'tel:' + property.user.phone" class="hover:underline">{{ property.user.phone }}</a>
+                    </p>
                   </div>
                 </div>
-              </div>
-              
-              <!-- Schedule a Visit -->
-              <div class="mt-6 bg-white rounded-lg shadow-md overflow-hidden border border-gray-100">
-                <div class="p-6">
-                  <h3 class="text-lg font-medium text-gray-900 mb-4">Schedule a Visit</h3>
-                  <button 
-                    @click="scheduleVisit"
-                    class="w-full flex items-center justify-center px-4 py-3 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 transition-all duration-200"
-                  >
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                    </svg>
-                    Schedule a Visit
-                  </button>
+                
+                <!-- Schedule Visit Section -->
+                <div class="mt-6 bg-white rounded-lg shadow-md overflow-hidden border border-gray-100">
+                  <div class="p-6">
+                    <h3 class="text-lg font-medium text-gray-900 mb-4">Schedule a Visit</h3>
+                    <button 
+                      @click="scheduleVisit"
+                      class="w-full flex items-center justify-center px-4 py-3 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 transition-all duration-200"
+                    >
+                      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                      </svg>
+                      Schedule a Visit
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
@@ -262,23 +270,25 @@
   </template>
   
   <script setup>
-  import { ref, onMounted, computed } from 'vue';
+  import { ref, onMounted, computed, watch } from 'vue';
   import { useRoute, useRouter } from 'vue-router';
-  import axios from 'axios';
+  import api from '../services/api';
+  import Project from '../models/Project';
   
   const route = useRoute();
   const router = useRouter();
   
   // State
+  const property = ref(null);
+  const isLoading = ref(true);
+  const error = ref(null);
   const currentImage = ref('');
   const imageLoaded = ref(false);
-  const isLoading = ref(true);
   const isSubmitting = ref(false);
-  const property = ref(null);
-  const error = ref(null);
+  const submissionSuccess = ref(false);
   
   // Form data
-  const inquiry = ref({
+  const inquiryForm = ref({
     name: '',
     email: '',
     phone: '',
@@ -287,80 +297,102 @@
   
   // Fetch property data
   const fetchProperty = async () => {
+    const propertyId = route.params.id;
+    
+    if (!propertyId) {
+      error.value = 'No property ID provided';
+      isLoading.value = false;
+      return;
+    }
+    
     try {
+      console.log(`⏳ Fetching property with ID: ${propertyId}...`);
       isLoading.value = true;
       error.value = null;
-      // Simulate API call - replace with actual API endpoint
-      await new Promise(resolve => setTimeout(resolve, 800));
       
-      // Mock data - replace with actual API response
-      property.value = {
-        id: route.params.id,
-        title: 'Modern Apartment with Stunning View',
-        price: 2500000,
-        pricePer: 'month',
-        address: '123 Palm Street, Casablanca',
-        description: 'Beautiful modern apartment located in the heart of the city. Features 3 bedrooms, 2 bathrooms, and a spacious living area with floor-to-ceiling windows offering breathtaking views of the city skyline. The apartment comes with high-end finishes, modern appliances, and access to building amenities including a swimming pool, gym, and 24/7 security.',
-        bedrooms: 3,
-        bathrooms: 2,
-        area: 1800,
-        yearBuilt: 2020,
-        highlights: [
-          '3 Bedrooms',
-          '2 Bathrooms',
-          '1800 sq. ft.',
-          '2 Parking Spots',
-          'Balcony',
-          'Fully Furnished'
-        ],
-        images: [
-          'https://images.unsplash.com/photo-1580587771525-78b9dba3b914?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1470&q=80',
-          'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?ixlib=rb-1.2.1&auto=format&fit=crop&w=1200&q=80',
-          'https://images.unsplash.com/photo-1493809842364-78817add7ffb?ixlib=rb-1.2.1&auto=format&fit=crop&w=1200&q=80',
-          'https://images.unsplash.com/photo-1502672260266-37eb8b0e4a26?ixlib=rb-1.2.1&auto=format&fit=crop&w=1200&q=80'
-        ],
-        features: [
-          'Air Conditioning',
-          'Heating',
-          'Elevator',
-          'Dishwasher',
-          'Washer/Dryer',
-          'Gym',
-          'Swimming Pool',
-          '24/7 Security',
-          'Parking',
-          'Balcony',
-          'Furnished',
-          'Pet Friendly'
-        ],
-        agent: {
-          name: 'Ahmed Benali',
-          phone: '+212 6XX-XXXXXX',
-          email: 'ahmed@example.com',
-          avatar: 'https://randomuser.me/api/portraits/men/1.jpg',
-          company: 'Luxury Estates',
-          experience: '10+ years',
-          propertiesSold: 245
-        }
+      const response = await api.getProject(propertyId);
+      console.log('✅ Raw API Response:', JSON.parse(JSON.stringify(response)));
+      
+      // Check if response exists and has data
+      if (!response) {
+        throw new Error('No response received from server');
+      }
+      
+      // Handle case where response might be the data directly
+      const responseData = response.data || response;
+      
+      if (!responseData) {
+        throw new Error('No data in response');
+      }
+      
+      console.log('📦 Response Data:', responseData);
+      
+      // Transform the API response to match the Project model's expectations
+      const formattedData = {
+        id: responseData.id,
+        user_id: responseData.user_id,
+        name: responseData.name,
+        housing_type: responseData.housing_type,
+        num_units: responseData.num_units,
+        location: responseData.location,
+        delivery_date: responseData.delivery_date,
+        price: responseData.price,
+        surface_area: responseData.surface_area,
+        description: responseData.description,
+        created_at: responseData.created_at,
+        updated_at: responseData.updated_at,
+        // Handle images if they exist in the response
+        images: Array.isArray(responseData.images) ? responseData.images : [],
+        // Include user data if available
+        user: responseData.user || {}
       };
       
-      currentImage.value = property.value.images?.[0] || '';
+      console.log('🔧 Formatted Data:', formattedData);
+      
+      // Validate required fields
+      const requiredFields = ['id', 'name', 'price', 'location'];
+      const missingFields = requiredFields.filter(field => !formattedData[field]);
+      
+      if (missingFields.length > 0) {
+        throw new Error(`Missing required fields: ${missingFields.join(', ')}`);
+      }
+      
+      try {
+        // Create a new Project instance with the formatted data
+        property.value = new Project(formattedData);
+        console.log('🏠 Successfully created Project instance:', property.value);
+        
+        // Set the first image as current if available
+        if (property.value.images && property.value.images.length > 0) {
+          currentImage.value = property.value.images[0].url || '';
+          imageLoaded.value = false;
+          console.log('🖼️ Set current image:', currentImage.value);
+        }
+      } catch (modelError) {
+        console.error('❌ Error creating Project instance:', modelError);
+        throw new Error(`Failed to create property: ${modelError.message}`);
+      }
+      
     } catch (err) {
-      console.error('Error fetching property:', err);
-      error.value = 'Failed to load property details. Please try again later.';
+      console.error('❌ Error in fetchProperty:', {
+        error: err,
+        message: err.message,
+        stack: err.stack
+      });
+      error.value = err.message || 'Failed to load property details. Please try again later.';
     } finally {
       isLoading.value = false;
     }
   };
   
-  // Format price
+  // Format price using the Project model's method
   const formattedPrice = computed(() => {
-    if (!property.value) return '';
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'MAD',
-      maximumFractionDigits: 0
-    }).format(property.value.price);
+    return property.value?.formattedPrice || '';
+  });
+  
+  // Format area using the Project model's method
+  const formattedArea = computed(() => {
+    return property.value?.formattedArea || '';
   });
   
   // Handle image loading
@@ -368,9 +400,16 @@
     imageLoaded.value = true;
   };
   
+  // Watch for route changes to load new property when ID changes
+  watch(() => route.params.id, (newId) => {
+    if (newId) {
+      fetchProperty();
+    }
+  });
+  
   // Handle form submission
   const submitInquiry = async () => {
-    if (!inquiry.value.name || !inquiry.value.email || !inquiry.value.message) {
+    if (!inquiryForm.value.name || !inquiryForm.value.email || !inquiryForm.value.message) {
       alert('Please fill in all required fields');
       return;
     }
@@ -381,10 +420,10 @@
       await new Promise(resolve => setTimeout(resolve, 1000));
       
       // In a real app, you would make an API call like this:
-      // await axios.post(`/api/properties/${route.params.id}/inquiry`, inquiry.value);
+      // await axios.post(`/api/properties/${route.params.id}/inquiry`, inquiryForm.value);
       
       alert('Your inquiry has been sent successfully!');
-      inquiry.value = { name: '', email: '', phone: '', message: '' };
+      inquiryForm.value = { name: '', email: '', phone: '', message: '' };
     } catch (error) {
       console.error('Error sending inquiry:', error);
       alert('Failed to send inquiry. Please try again.');
@@ -400,7 +439,12 @@
   
   // Fetch property data when component is mounted
   onMounted(() => {
-    fetchProperty();
+    if (route.params.id) {
+      fetchProperty();
+    } else {
+      error.value = 'No property ID provided';
+      isLoading.value = false;
+    }
   });
   </script>
   
