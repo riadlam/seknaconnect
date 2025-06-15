@@ -61,14 +61,14 @@
             <button 
               v-for="(img, index) in property.images.slice(0, 5)" 
               :key="index"
-              @click="currentImage = img"
+              @click="setCurrentImage(img)"
               class="flex-shrink-0 w-16 h-16 rounded-md overflow-hidden border-2 transition-all duration-200"
               :class="{
-                'border-purple-600 ring-2 ring-purple-400': currentImage === img,
-                'border-transparent hover:border-gray-300': currentImage !== img
+                'border-purple-600 ring-2 ring-purple-400': currentImage === getImageUrl(img),
+                'border-transparent hover:border-gray-300': currentImage !== getImageUrl(img)
               }"
             >
-              <img :src="img" class="w-full h-full object-cover" :alt="'Property image ' + (index + 1)">
+              <img :src="getImageUrl(img)" class="w-full h-full object-cover" :alt="'Property image ' + (index + 1)">
             </button>
           </div>
         </div>
@@ -295,6 +295,25 @@
     message: ''
   });
   
+  // Helper function to get image URL from either string or object
+  const getImageUrl = (img) => {
+    if (!img) return '';
+    // If it's already a string URL, return it
+    if (typeof img === 'string') return img;
+    // If it's an object with a url/path property, return that
+    if (img.url) return img.url;
+    if (img.path) return img.path;
+    // If it's an object with other properties, try to find the first string value
+    const firstValue = Object.values(img).find(val => typeof val === 'string');
+    return firstValue || '';
+  };
+  
+  // Set current image with proper URL handling
+  const setCurrentImage = (img) => {
+    currentImage.value = getImageUrl(img);
+    imageLoaded.value = false;
+  };
+  
   // Fetch property data
   const fetchProperty = async () => {
     const propertyId = route.params.id;
@@ -361,6 +380,11 @@
         // Create a new Project instance with the formatted data
         property.value = new Project(formattedData);
         console.log('🏠 Successfully created Project instance:', property.value);
+        
+        // Set the first image as current if available
+        if (property.value.images && property.value.images.length > 0) {
+          currentImage.value = getImageUrl(property.value.images[0]);
+        }
         
         // Set the first image as current if available
         if (property.value.images && property.value.images.length > 0) {
