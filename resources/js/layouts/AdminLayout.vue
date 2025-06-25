@@ -198,7 +198,7 @@ watch(() => route.meta, (newMeta) => {
 const navigation = [
   { name: 'Dashboard', href: '/admin/dashboard', icon: 'HomeIcon' },
   { name: 'Projects', href: '/admin/projects', icon: 'HomeModernIcon' },
-  { name: 'Clients', href: '/admin/clients', icon: 'UserGroupIcon' },
+  { name: 'Inquiries', href: '/admin/inquiries', icon: 'UserGroupIcon' },
   { name: 'Properties', href: '/admin/properties', icon: 'BuildingOfficeIcon' },
   { name: 'Documents', href: '/admin/documents', icon: 'DocumentTextIcon' },
   { name: 'Settings', href: '/admin/settings', icon: 'Cog6ToothIcon' },

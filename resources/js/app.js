@@ -14,6 +14,7 @@ import Auth from './views/Auth.vue';
 import AdminLayout from './layouts/AdminLayout.vue';
 import ProfessionalDashboard from './views/admin/admin_professionel/ProfessionalDashboard.vue';
 import ProjectsList from './views/admin/admin_professionel/ProjectsList.vue';
+import InquiriesList from './views/admin/admin_professionel/InquiriesList.vue';
 
 // Set base URL for API requests
 axios.defaults.baseURL = 'http://192.168.1.8:8000';
@@ -100,10 +101,10 @@ const routes = [
         props: true,
       },
       {
-        path: 'clients',
-        component: ProfessionalDashboard, // TODO: Create ClientsList component
-        name: 'admin.clients',
-        meta: { title: 'Clients' }
+        path: 'inquiries',
+        component: InquiriesList,
+        name: 'admin.inquiries',
+        meta: { title: 'Inquiries' }
       },
       {
         path: 'properties',
