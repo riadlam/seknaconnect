@@ -18,6 +18,9 @@ Route::post('/projects/{id}/inquiries', [InquiryController::class, 'store']);
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/user', [AuthController::class, 'user']);
     Route::post('/logout', [AuthController::class, 'logout']);
+    
+    // Get authenticated user's projects
+    Route::get('/user/projects', [ProjectController::class, 'userProjects']);
 
     // Professional-only routes
     Route::post('/projects', [ProjectController::class, 'store']);

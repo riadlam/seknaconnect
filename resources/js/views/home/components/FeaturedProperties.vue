@@ -105,15 +105,19 @@
                 <PropertyCard 
                   :property="{
                     id: property.id,
-                    title: property.name,
+                    title: property.title || property.name,
                     location: property.location,
-                    price: property.formattedPrice,
-                    image: property.mainImage.url,
-                    alt: property.name,
-                    area: property.formattedArea,
-                    type: property.housingType,
-                    featured: property.featured,
-                    isNew: property.isNew
+                    price: property.price,
+                    image: property.image,
+                    images: property.images,
+                    alt: property.title || property.name,
+                    area: property.area,
+                    type: property.type || property.housing_type,
+                    bedrooms: property.bedrooms,
+                    bathrooms: property.bathrooms,
+                    featured: property.featured || false,
+                    description: property.description,
+                    delivery_date: property.delivery_date
                   }" 
                   class="h-full w-full cursor-pointer hover:shadow-lg transition-shadow duration-300"
                   @click="viewProperty(property)"
@@ -182,37 +186,48 @@ export default {
         isLoading.value = true;
         error.value = null;
         
-        // Get all projects
-        const response = await api.getProjects(1, 100);
-        console.log('✅ Projects API Response:', response);
+        // Get all projects using a direct fetch to ensure we get the raw data
+        const response = await fetch('http://192.168.1.8:8000/api/projects', {
+          headers: {
+            'Accept': 'application/json'
+          }
+        });
         
-        // Handle error response
-        if (response.error) {
-          console.error('❌ API Error:', response.error);
-          error.value = response.error;
-          projects.value = [];
-          return;
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
         }
         
-        // Extract projects array from response
-        const projectsData = Array.isArray(response) 
-          ? response 
-          : (response.data || []);
-        
-        console.log('📊 Projects data to process:', projectsData);
+        const projectsData = await response.json();
+        console.log('✅ Projects API Response:', projectsData);
         
         if (projectsData.length > 0) {
-          const projectInstances = projectsData.map(project => {
-            try {
-              return new Project(project);
-            } catch (e) {
-              console.error('Error creating Project instance:', e, 'Project data:', project);
-              return null;
-            }
-          }).filter(Boolean);
+          // Map the API response to the format expected by PropertyCard
+          const mappedProjects = projectsData.map(project => ({
+            id: project.id,
+            name: project.name,
+            title: project.name, // For backward compatibility
+            type: project.housing_type,
+            housing_type: project.housing_type, // Keep original for reference
+            location: project.location,
+            price: `$${parseFloat(project.price).toLocaleString()}`,
+            area: project.surface_area ? `${project.surface_area} m²` : 'N/A',
+            image: project.images?.[0]?.image_path || 'https://via.placeholder.com/600x400?text=No+Image',
+            images: project.images?.map(img => ({
+              image_path: img.image_path,
+              url: img.image_path, // Add url as an alias for image_path
+              caption: img.caption || ''
+            })) || [],
+            bedrooms: project.num_units || 0,
+            bathrooms: 1, // Default to 1 bathroom
+            featured: project.featured || false,
+            delivery_date: project.delivery_date,
+            description: project.description || '',
+            // Add original data in case it's needed
+            _original: project
+          }));
           
-          console.log('🏠 Successfully processed projects:', projectInstances.length);
-          projects.value = projectInstances;
+          console.log('🏠 Mapped projects:', mappedProjects);
+          projects.value = mappedProjects;
         } else {
           console.warn('⚠️ No projects found in the response');
           projects.value = [];

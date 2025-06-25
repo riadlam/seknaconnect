@@ -26,7 +26,7 @@
           >
             <DialogPanel class="w-full max-w-2xl transform overflow-hidden rounded-2xl bg-white p-6 text-left align-middle shadow-xl transition-all">
               <DialogTitle as="h3" class="text-lg font-medium leading-6 text-gray-900">
-                Add New Project
+                {{ isEditing ? 'Edit Project' : 'Add New Project' }}
               </DialogTitle>
               
               <div class="mt-6 space-y-6">
@@ -253,14 +253,19 @@
 </template>
 
 <script setup>
-import { ref, watch } from 'vue';
+import { ref, computed, watch } from 'vue';
 import { Dialog, DialogPanel, DialogTitle, TransitionChild, TransitionRoot } from '@headlessui/vue';
+import { XMarkIcon } from '@heroicons/vue/24/outline';
 import axios from 'axios';
 
 const props = defineProps({
   isOpen: {
     type: Boolean,
     required: true,
+  },
+  project: {
+    type: Object,
+    default: null,
   },
 });
 
@@ -287,6 +292,8 @@ const closeModal = () => {
   emit('close');
 };
 
+const isEditing = computed(() => !!props.project);
+
 const submitForm = async () => {
   // Reset messages
   errorMessage.value = '';
@@ -301,40 +308,56 @@ const submitForm = async () => {
   isSubmitting.value = true;
   
   try {
-    // Get the auth token from localStorage
     const token = localStorage.getItem('token');
     if (!token) {
       throw new Error('Authentication token not found. Please log in again.');
     }
     
-    // Create FormData for file uploads
-    const formPayload = new FormData();
+    const headers = {
+      'Accept': 'application/json',
+      'Authorization': `Bearer ${token}`,
+    };
     
-    // Append form data (except captions)
-    Object.keys(formData.value).forEach(key => {
-      if (key !== 'captions' && formData.value[key] !== null && formData.value[key] !== undefined) {
-        formPayload.append(key, formData.value[key]);
-      }
-    });
+    let response;
     
-    // Append images and captions
-    previewImages.value.forEach((file, index) => {
-      formPayload.append('images[]', file.file);
-      const caption = file.caption || '';
-      formPayload.append('captions[]', caption);
-    });
-    
-    // Make the API request
-    const response = await axios.post('/api/projects', formPayload, {
-      headers: {
-        'Accept': 'application/json',
-        'Authorization': `Bearer ${token}`,
-        'Content-Type': 'multipart/form-data'
-      }
-    });
-    
-    // Handle success
-    successMessage.value = 'Project created successfully!';
+    if (isEditing.value) {
+      // For editing, use PUT with JSON data
+      headers['Content-Type'] = 'application/json';
+      
+      // Create a clean payload without empty values
+      const payload = {};
+      Object.keys(formData.value).forEach(key => {
+        if (formData.value[key] !== null && formData.value[key] !== undefined && formData.value[key] !== '') {
+          payload[key] = formData.value[key];
+        }
+      });
+      
+      response = await axios.put(`/api/projects/${props.project.id}`, payload, { headers });
+      successMessage.value = 'Project updated successfully!';
+    } else {
+      // For new project, use FormData for file uploads
+      headers['Content-Type'] = 'multipart/form-data';
+      const formPayload = new FormData();
+      
+      // Append form data (except captions)
+      Object.keys(formData.value).forEach(key => {
+        if (key !== 'captions' && formData.value[key] !== null && formData.value[key] !== undefined) {
+          formPayload.append(key, formData.value[key]);
+        }
+      });
+      
+      // Append images and captions
+      previewImages.value.forEach((file, index) => {
+        if (file.file) { // Only append new files
+          formPayload.append('images[]', file.file);
+          const caption = file.caption || '';
+          formPayload.append('captions[]', caption);
+        }
+      });
+      
+      response = await axios.post('/api/projects', formPayload, { headers });
+      successMessage.value = 'Project created successfully!';
+    }
     
     // Reset form and close dialog after a short delay
     setTimeout(() => {
@@ -344,8 +367,9 @@ const submitForm = async () => {
     }, 1500);
     
   } catch (error) {
-    console.error('Error creating project:', error);
-    errorMessage.value = error.response?.data?.message || 'Failed to create project. Please try again.';
+    console.error(`Error ${isEditing.value ? 'updating' : 'creating'} project:`, error);
+    errorMessage.value = error.response?.data?.message || 
+      `Failed to ${isEditing.value ? 'update' : 'create'} project. Please try again.`;
   } finally {
     isSubmitting.value = false;
   }
@@ -409,10 +433,23 @@ const removeImage = (index) => {
   previewImages.value.splice(index, 1);
 };
 
-// Reset form when dialog is opened/closed
-watch(() => props.isOpen, (isOpen) => {
+// Initialize form when dialog is opened or project changes
+watch([() => props.isOpen, () => props.project], ([isOpen, project]) => {
   if (isOpen) {
-    resetForm();
+    if (project) {
+      // Populate form with project data for editing
+      const { id, user_id, created_at, updated_at, images, user, ...projectData } = project;
+      formData.value = { ...formData.value, ...projectData };
+      
+      // Set preview images from existing project
+      previewImages.value = (images || []).map(img => ({
+        preview: img.image_path,
+        caption: img.caption,
+        id: img.id
+      }));
+    } else {
+      resetForm();
+    }
   }
-});
+}, { immediate: true });
 </script>

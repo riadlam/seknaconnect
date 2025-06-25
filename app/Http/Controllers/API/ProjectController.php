@@ -62,8 +62,6 @@ class ProjectController extends Controller
      */
     public function index(Request $request)
     {
-        $perPage = $request->input('per_page', 15);
-        
         $query = Project::with(['images', 'user']);
 
         if ($request->has('housing_type')) {
@@ -82,7 +80,7 @@ class ProjectController extends Controller
             $query->where('price', '<=', $request->price_max);
         }
 
-        return $query->latest()->paginate($perPage);
+        return $query->latest()->get();
     }
 
     // Show single project
@@ -182,12 +180,75 @@ class ProjectController extends Controller
         return response()->json($project, 201);
     }
 
-    // Update project
+    /**
+     * Update the specified project
+     *
+     * @OA\Put(
+     *     path="/api/projects/{id}",
+     *     summary="Update a project",
+     *     tags={"Projects"},
+     *     security={{"bearerAuth":{}}},
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         required=true,
+     *         description="Project ID",
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\MediaType(
+     *             mediaType="application/json",
+     *             @OA\Schema(
+     *                 @OA\Property(property="name", type="string", example="Updated Project Name"),
+     *                 @OA\Property(property="housing_type", type="string", example="villa"),
+     *                 @OA\Property(property="num_units", type="integer", example=10),
+     *                 @OA\Property(property="location", type="string", example="Updated Location"),
+     *                 @OA\Property(property="delivery_date", type="string", format="date", example="2024-12-31"),
+     *                 @OA\Property(property="price", type="number", format="float", example=5000000),
+     *                 @OA\Property(property="surface_area", type="number", format="float", example=250.5),
+     *                 @OA\Property(property="description", type="string", nullable=true)
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Project updated successfully",
+     *         @OA\JsonContent(ref="#/components/schemas/Project")
+     *     ),
+     *     @OA\Response(
+     *         response=403,
+     *         description="Unauthorized",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="error", type="string", example="Unauthorized")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="Project not found",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="error", type="string", example="Project not found")
+     *         )
+     *     )
+     * )
+     */
     public function update(Request $request, $id)
     {
         $project = $request->user()->projects()->findOrFail($id);
 
-        $project->update($request->all());
+        $validated = $request->validate([
+            'name' => 'sometimes|required|string|max:255',
+            'housing_type' => 'sometimes|required|string|max:100',
+            'num_units' => 'sometimes|required|integer|min:1',
+            'location' => 'sometimes|required|string|max:255',
+            'delivery_date' => 'sometimes|required|date|after:today',
+            'price' => 'sometimes|required|numeric|min:0',
+            'surface_area' => 'sometimes|required|numeric|min:0',
+            'description' => 'nullable|string'
+        ]);
+
+        $project->update($validated);
+        $project->load(['images', 'user']);
 
         return response()->json($project);
     }
@@ -199,5 +260,34 @@ class ProjectController extends Controller
         $project->delete();
 
         return response()->json(['message' => 'Project deleted']);
+    }
+
+    /**
+     * Get all projects for the authenticated user
+     *
+     * @OA\Get(
+     *     path="/api/user/projects",
+     *     summary="Get all projects for the authenticated user",
+     *     tags={"User Projects"},
+     *     security={{"bearerAuth":{}}},
+     *     @OA\Response(
+     *         response=200,
+     *         description="List of user's projects",
+     *         @OA\JsonContent(
+     *             type="array",
+     *             @OA\Items(ref="#/components/schemas/Project")
+     *         )
+     *     )
+     * )
+     */
+    public function userProjects(Request $request)
+    {
+        $projects = $request->user()
+            ->projects()
+            ->with(['images', 'user'])
+            ->latest()
+            ->get();
+
+        return response()->json($projects);
     }
 }
