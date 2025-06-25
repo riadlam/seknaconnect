@@ -155,15 +155,19 @@
                   <p class="mt-1 text-purple-100">Contact the seller for more information</p>
                 </div>
                 <div class="p-6">
-                  <form @submit.prevent="submitInquiry" class="space-y-4">
+                  <form @submit.prevent="submitInquiry" class="space-y-4 relative" :class="{ 'opacity-50': isSubmitting }">
+                    <div v-if="isSubmitting" class="absolute inset-0 bg-white/50 flex items-center justify-center z-10">
+                      <div class="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-purple-600"></div>
+                    </div>
                     <div>
                       <label for="name" class="block text-sm font-medium text-gray-700">Name</label>
                       <input 
                         type="text" 
                         id="name" 
                         v-model="inquiryForm.name"
+                        :disabled="isSubmitting"
                         required
-                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500 sm:text-sm"
+                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500 sm:text-sm disabled:bg-gray-50 disabled:text-gray-500"
                         placeholder="Your name"
                       >
                     </div>
@@ -184,7 +188,8 @@
                         type="tel" 
                         id="phone" 
                         v-model="inquiryForm.phone"
-                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500 sm:text-sm"
+                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500 sm:text-sm disabled:bg-gray-50 disabled:text-gray-500"
+                        :disabled="isSubmitting"
                         placeholder="+212 6XX-XXXXXX"
                       >
                     </div>
@@ -195,22 +200,41 @@
                         v-model="inquiryForm.message"
                         rows="4"
                         required
-                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500 sm:text-sm"
+                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500 sm:text-sm disabled:bg-gray-50 disabled:text-gray-500"
+                        :disabled="isSubmitting"
                         placeholder="I'm interested in this property..."
                       ></textarea>
                     </div>
-                    <button 
-                      type="submit" 
-                      :disabled="isSubmitting"
-                      class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 disabled:opacity-50 disabled:cursor-not-allowed"
-                    >
-                      <span v-if="!isSubmitting">Send Message</span>
-                      <span v-else>Sending...</span>
-                    </button>
+                    <div class="space-y-2">
+                      <button 
+                        type="submit" 
+                        :disabled="isSubmitting"
+                        class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200"
+                      >
+                        <span v-if="!isSubmitting">Send Message</span>
+                        <span v-else class="flex items-center">
+                          <svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                          </svg>
+                          Sending...
+                        </span>
+                      </button>
+                      
+                      <div v-if="formError" class="text-red-600 text-sm p-2 bg-red-50 rounded-md">
+                        {{ formError }}
+                      </div>
+                      
+                      <div v-if="submissionSuccess" class="p-3 bg-green-50 border border-green-200 text-green-700 rounded-md text-sm transition-all duration-300 ease-in-out">
+                        <div class="flex items-center">
+                          <svg class="h-5 w-5 text-green-500 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                          </svg>
+                          <span>Your message has been sent successfully! We'll get back to you soon.</span>
+                        </div>
+                      </div>
+                    </div>
                   </form>
-                  <div v-if="submissionSuccess" class="mt-4 p-3 bg-green-100 text-green-700 rounded-md text-sm">
-                    Your message has been sent successfully!
-                  </div>
                   
                   <!-- Contact Information -->
                   <div v-if="property?.user" class="mt-6 pt-4 border-t border-gray-100">
@@ -286,6 +310,7 @@
   const imageLoaded = ref(false);
   const isSubmitting = ref(false);
   const submissionSuccess = ref(false);
+  const formError = ref('');
   
   // Form data
   const inquiryForm = ref({
@@ -434,23 +459,52 @@
   // Handle form submission
   const submitInquiry = async () => {
     if (!inquiryForm.value.name || !inquiryForm.value.email || !inquiryForm.value.message) {
-      alert('Please fill in all required fields');
+      formError.value = 'Please fill in all required fields';
       return;
     }
     
     try {
+      formError.value = '';
+      submissionSuccess.value = false;
       isSubmitting.value = true;
-      // Simulate API call - replace with actual API endpoint
-      await new Promise(resolve => setTimeout(resolve, 1000));
       
-      // In a real app, you would make an API call like this:
-      // await axios.post(`/api/properties/${route.params.id}/inquiry`, inquiryForm.value);
+      // Prepare the request data
+      const inquiryData = {
+        name: inquiryForm.value.name,
+        email: inquiryForm.value.email,
+        message: inquiryForm.value.message,
+        phone: inquiryForm.value.phone || '' // Include phone if provided
+      };
+
+      // Make API call to submit the inquiry
+      const response = await axios.post(
+        `/api/projects/${route.params.id}/inquiries`,
+        inquiryData,
+        {
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+          }
+        }
+      );
       
-      alert('Your inquiry has been sent successfully!');
+      // Show success state
+      submissionSuccess.value = true;
+      
+      // Reset the form
       inquiryForm.value = { name: '', email: '', phone: '', message: '' };
+      
+      // Hide success message after 5 seconds
+      setTimeout(() => {
+        submissionSuccess.value = false;
+      }, 5000);
+      
+      return response.data;
+      
     } catch (error) {
       console.error('Error sending inquiry:', error);
-      alert('Failed to send inquiry. Please try again.');
+      formError.value = error.response?.data?.message || 'Failed to send inquiry. Please try again.';
+      throw error;
     } finally {
       isSubmitting.value = false;
     }
