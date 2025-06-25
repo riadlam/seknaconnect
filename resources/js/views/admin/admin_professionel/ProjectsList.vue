@@ -6,12 +6,15 @@
         <p class="mt-2 text-sm text-gray-700">A list of all property projects in the system.</p>
       </div>
       <div class="mt-4 sm:mt-0 sm:ml-16 sm:flex-none">
-        <router-link
-          to="/admin/projects/new"
+        <button
+          @click="openAddProjectDialog"
           class="inline-flex items-center justify-center rounded-md border border-transparent bg-purple-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 sm:w-auto"
         >
+          <svg xmlns="http://www.w3.org/2000/svg" class="-ml-1 mr-2 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+          </svg>
           Add Project
-        </router-link>
+        </button>
       </div>
     </div>
     <div class="mt-8 flex flex-col">
@@ -136,14 +139,20 @@
         </div>
       </div>
     </div>
+    <!-- Add Project Dialog -->
+    <AddProjectDialog 
+      :is-open="showAddDialog" 
+      @close="showAddDialog = false"
+      @submit="handleAddProject"
+    />
   </div>
 </template>
 
 <script setup>
 import { ref, computed, onMounted } from 'vue';
 import { ChevronLeftIcon, ChevronRightIcon } from '@heroicons/vue/20/solid';
+import AddProjectDialog from '../../../components/projects/AddProjectDialog.vue';
 
-// Sample data - replace with API call
 const projects = ref([
   { id: 1, name: 'Sunset Villas', housing_type: 'Villa', num_units: 24, location: 'Marrakech' },
   { id: 2, name: 'Ocean View Residences', housing_type: 'Apartment', num_units: 120, location: 'Casablanca' },
@@ -151,6 +160,8 @@ const projects = ref([
   { id: 4, name: 'Mountain Retreat', housing_type: 'Villa', num_units: 12, location: 'Ifrane' },
   { id: 5, name: 'Desert Mirage', housing_type: 'Apartment', num_units: 80, location: 'Ouarzazate' },
 ]);
+
+const showAddDialog = ref(false);
 
 // Pagination
 const currentPage = ref(1);
@@ -188,6 +199,16 @@ const deleteProject = (id) => {
     // Replace with actual API call
     projects.value = projects.value.filter(project => project.id !== id);
   }
+};
+
+const openAddProjectDialog = () => {
+  showAddDialog.value = true;
+};
+
+const handleAddProject = (newProject) => {
+  // Add the new project to the beginning of the list
+  projects.value.unshift(newProject);
+  showAddDialog.value = false;
 };
 
 // Fetch projects from API
