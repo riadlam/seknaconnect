@@ -31,4 +31,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::delete('/project-images/{id}', [ProjectImageController::class, 'destroy']);
 
     Route::get('/professional/inquiries', [InquiryController::class, 'index']);
+    
+    // Admin routes
+    Route::get('/admin/users', [AuthController::class, 'getUsers']);
+    Route::delete('/admin/users/{id}', [AuthController::class, 'deleteUser']);
 });
