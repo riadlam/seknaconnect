@@ -130,21 +130,6 @@
                 <h2 class="text-lg font-medium text-gray-900 mb-4">Description</h2>
                 <p class="text-gray-600 whitespace-pre-line">{{ property.description || 'No description available.' }}</p>
               </div>
-  
-              <!-- Features -->
-              <div class="py-6">
-                <h2 class="text-lg font-medium text-gray-900 mb-4">Features & Amenities</h2>
-                <div class="grid grid-cols-2 gap-4">
-                  <div v-for="(feature, index) in property.features" :key="index" class="flex items-center">
-                    <div class="flex-shrink-0 h-5 w-5 text-purple-500">
-                      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                        <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
-                      </svg>
-                    </div>
-                    <span class="ml-2 text-gray-700">{{ feature }}</span>
-                  </div>
-                </div>
-              </div>
             </div>
   
             <!-- Right Column - Contact Form -->
@@ -154,83 +139,140 @@
                   <h3 class="text-xl font-semibold">Interested in this property?</h3>
                   <p class="mt-1 text-purple-100">Contact the seller for more information</p>
                 </div>
-                <div class="p-6">
-                  <form @submit.prevent="submitInquiry" class="space-y-4 relative" :class="{ 'opacity-50': isSubmitting }">
-                    <div v-if="isSubmitting" class="absolute inset-0 bg-white/50 flex items-center justify-center z-10">
-                      <div class="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-purple-600"></div>
+                <div class="p-4 sm:p-6">
+                  <form @submit.prevent="submitInquiry" class="space-y-5 relative" :class="{ 'opacity-50': isSubmitting }">
+                    <div v-if="isSubmitting" class="absolute inset-0 bg-white/80 backdrop-blur-sm flex items-center justify-center z-10 rounded-lg">
+                      <div class="bg-white p-4 rounded-lg shadow-lg flex flex-col items-center">
+                        <div class="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-purple-600"></div>
+                        <p class="mt-2 text-sm text-gray-600">Sending your message...</p>
+                      </div>
                     </div>
-                    <div>
-                      <label for="name" class="block text-sm font-medium text-gray-700">Name</label>
-                      <input 
-                        type="text" 
-                        id="name" 
-                        v-model="inquiryForm.name"
-                        :disabled="isSubmitting"
-                        required
-                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500 sm:text-sm disabled:bg-gray-50 disabled:text-gray-500"
-                        placeholder="Your name"
-                      >
+                    
+                    <!-- Grid Layout for Name, Email, and Phone -->
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <!-- Name Field -->
+                      <div class="space-y-1">
+                        <label for="name" class="block text-sm font-medium text-gray-700">Full Name <span class="text-red-500">*</span></label>
+                        <div class="relative mt-1 rounded-md shadow-sm">
+                          <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <svg class="h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                              <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd" />
+                            </svg>
+                          </div>
+                          <input 
+                            type="text" 
+                            id="name" 
+                            v-model="inquiryForm.name"
+                            :disabled="isSubmitting"
+                            required
+                            class="focus:ring-purple-500 focus:border-purple-500 block w-full pl-10 sm:text-sm border-gray-300 rounded-md py-3 border"
+                            placeholder="John Doe"
+                          >
+                        </div>
+                      </div>
+                      
+                      <!-- Email Field -->
+                      <div class="space-y-1">
+                        <label for="email" class="block text-sm font-medium text-gray-700">Email <span class="text-red-500">*</span></label>
+                        <div class="relative mt-1 rounded-md shadow-sm">
+                          <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <svg class="h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                              <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z" />
+                              <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z" />
+                            </svg>
+                          </div>
+                          <input 
+                            type="email" 
+                            id="email" 
+                            v-model="inquiryForm.email"
+                            required
+                            class="focus:ring-purple-500 focus:border-purple-500 block w-full pl-10 sm:text-sm border-gray-300 rounded-md py-3 border"
+                            placeholder="your@email.com"
+                          >
+                        </div>
+                      </div>
+                      
+                      <!-- Phone Field (full width on mobile, half on larger screens) -->
+                      <div class="space-y-1 sm:col-span-2">
+                        <label for="phone" class="block text-sm font-medium text-gray-700">Phone Number</label>
+                        <div class="relative mt-1 rounded-md shadow-sm">
+                          <div class="absolute inset-y-0 left-0 flex items-center">
+                            <label for="country" class="sr-only">Country</label>
+                            <select id="country" name="country" class="focus:ring-purple-500 focus:border-purple-500 h-full py-0 pl-3 pr-7 border-transparent bg-transparent text-gray-500 sm:text-sm rounded-l-md">
+                              <option>DZ +213</option>
+                            </select>
+                          </div>
+                          <input 
+                            type="tel" 
+                            id="phone" 
+                            v-model="inquiryForm.phone"
+                            class="focus:ring-purple-500 focus:border-purple-500 block w-full pl-24 sm:text-sm border-gray-300 rounded-md py-3 border"
+                            :disabled="isSubmitting"
+                            placeholder="6 12 34 56 78"
+                          >
+                        </div>
+                        <p class="mt-1 text-xs text-gray-500">Optional, but recommended for faster response</p>
+                      </div>
                     </div>
-                    <div>
-                      <label for="email" class="block text-sm font-medium text-gray-700">Email</label>
-                      <input 
-                        type="email" 
-                        id="email" 
-                        v-model="inquiryForm.email"
-                        required
-                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500 sm:text-sm"
-                        placeholder="your@email.com"
-                      >
+                    
+                    <!-- Message Field (full width) -->
+                    <div class="space-y-1">
+                      <label for="message" class="block text-sm font-medium text-gray-700">Your Message <span class="text-red-500">*</span></label>
+                      <div class="mt-1">
+                        <textarea 
+                          id="message" 
+                          v-model="inquiryForm.message"
+                          rows="4"
+                          required
+                          class="shadow-sm focus:ring-purple-500 focus:border-purple-500 block w-full sm:text-sm border-gray-300 rounded-md py-3 px-4 border"
+                          :disabled="isSubmitting"
+                          placeholder="Hello, I'm interested in this property. Could you please provide more details about..."
+                        ></textarea>
+                      </div>
+                      <p class="mt-1 text-xs text-gray-500">Please include any specific questions or requirements</p>
                     </div>
-                    <div>
-                      <label for="phone" class="block text-sm font-medium text-gray-700">Phone (optional)</label>
-                      <input 
-                        type="tel" 
-                        id="phone" 
-                        v-model="inquiryForm.phone"
-                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500 sm:text-sm disabled:bg-gray-50 disabled:text-gray-500"
-                        :disabled="isSubmitting"
-                        placeholder="+212 6XX-XXXXXX"
-                      >
-                    </div>
-                    <div>
-                      <label for="message" class="block text-sm font-medium text-gray-700">Message</label>
-                      <textarea 
-                        id="message" 
-                        v-model="inquiryForm.message"
-                        rows="4"
-                        required
-                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-purple-500 focus:ring-purple-500 sm:text-sm disabled:bg-gray-50 disabled:text-gray-500"
-                        :disabled="isSubmitting"
-                        placeholder="I'm interested in this property..."
-                      ></textarea>
-                    </div>
-                    <div class="space-y-2">
+                    <!-- Form Actions -->
+                    <div class="space-y-3 pt-2">
                       <button 
                         type="submit" 
                         :disabled="isSubmitting"
-                        class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200"
+                        class="w-full flex justify-center items-center py-3 px-6 border border-transparent rounded-md shadow-sm text-base font-medium text-white bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 disabled:opacity-70 disabled:cursor-not-allowed transition-all duration-200 ease-in-out transform hover:-translate-y-0.5"
                       >
-                        <span v-if="!isSubmitting">Send Message</span>
+                        <span v-if="!isSubmitting" class="flex items-center">
+                          <svg class="w-5 h-5 mr-2 -ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+                          </svg>
+                          Send Message
+                        </span>
                         <span v-else class="flex items-center">
-                          <svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                          <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                             <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                             <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                           </svg>
-                          Sending...
+                          Sending your message...
                         </span>
                       </button>
                       
-                      <div v-if="formError" class="text-red-600 text-sm p-2 bg-red-50 rounded-md">
-                        {{ formError }}
+                      <!-- Form Error Message -->
+                      <div v-if="formError" class="mt-3 p-3 bg-red-50 border-l-4 border-red-500 rounded-r">
+                        <div class="flex items-center">
+                          <svg class="h-5 w-5 text-red-500 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                          </svg>
+                          <p class="text-sm font-medium text-red-700">{{ formError }}</p>
+                        </div>
                       </div>
                       
-                      <div v-if="submissionSuccess" class="p-3 bg-green-50 border border-green-200 text-green-700 rounded-md text-sm transition-all duration-300 ease-in-out">
-                        <div class="flex items-center">
-                          <svg class="h-5 w-5 text-green-500 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                      <!-- Success Message -->
+                      <div v-if="submissionSuccess" class="mt-3 p-3 bg-green-50 border-l-4 border-green-500 rounded-r">
+                        <div class="flex items-start">
+                          <svg class="h-5 w-5 text-green-500 mt-0.5 mr-2 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                           </svg>
-                          <span>Your message has been sent successfully! We'll get back to you soon.</span>
+                          <div>
+                            <p class="text-sm font-medium text-green-800">Message sent successfully!</p>
+                            <p class="text-xs text-green-600 mt-1">We've received your inquiry and will get back to you shortly.</p>
+                          </div>
                         </div>
                       </div>
                     </div>
@@ -248,22 +290,7 @@
                     </p>
                   </div>
                 </div>
-                
-                <!-- Schedule Visit Section -->
-                <div class="mt-6 bg-white rounded-lg shadow-md overflow-hidden border border-gray-100">
-                  <div class="p-6">
-                    <h3 class="text-lg font-medium text-gray-900 mb-4">Schedule a Visit</h3>
-                    <button 
-                      @click="scheduleVisit"
-                      class="w-full flex items-center justify-center px-4 py-3 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 transition-all duration-200"
-                    >
-                      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                      </svg>
-                      Schedule a Visit
-                    </button>
-                  </div>
-                </div>
+              
               </div>
             </div>
           </div>
@@ -434,9 +461,11 @@
     }
   };
   
-  // Format price using the Project model's method
+  // Format price in DZD with proper formatting
   const formattedPrice = computed(() => {
-    return property.value?.formattedPrice || '';
+    if (!property.value?.price) return 'N/A';
+    const numericValue = Number(String(property.value.price).replace(/[^0-9.-]+/g, ""));
+    return `${numericValue.toLocaleString('ar-DZ')} DZD`;
   });
   
   // Format area using the Project model's method
