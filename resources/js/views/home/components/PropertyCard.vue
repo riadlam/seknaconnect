@@ -81,28 +81,17 @@
         </div>
         <div class="text-right">
           <p class="text-xl sm:text-2xl font-bold text-purple-700">
-            {{ property.price }}
+            {{ formatPrice(property.price) }}
           </p>
           <p v-if="property.originalPrice" class="text-sm text-gray-400 line-through">
-            ${{ property.originalPrice.toLocaleString() }}
+            {{ formatPrice(property.originalPrice) }}
           </p>
         </div>
       </div>
 
       <!-- Features -->
       <div class="mt-4 border-t pt-4 grid grid-cols-3 gap-2 text-center text-xs sm:text-sm">
-        <div class="flex flex-col items-center gap-1 hover:bg-gray-50 p-2 rounded-lg">
-          <svg class="w-5 h-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
-          </svg>
-          <span>{{ property.bedrooms || 'N/A' }} Beds</span>
-        </div>
-        <div class="flex flex-col items-center gap-1 hover:bg-gray-50 p-2 rounded-lg">
-          <svg class="w-5 h-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-          </svg>
-          <span>{{ property.bathrooms || 'N/A' }} Baths</span>
-        </div>
+
         <div class="flex flex-col items-center gap-1 hover:bg-gray-50 p-2 rounded-lg">
           <svg class="w-5 h-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h.5A2.5 2.5 0 0022 5.5v-1.6a1 1 0 00-.293-.707l-1.4-1.4A1 1 0 0019.4 2H4.6a1 1 0 00-.707.293l-1.4 1.4A1 1 0 002 4.6V18a2 2 0 002 2h3m8-12h.01M3 21h18m-7-6h.01" />
@@ -165,6 +154,14 @@ export default {
     const showShareOptions = ref(false);
     const isFavorite = ref(false);
 
+    const formatPrice = (price) => {
+      if (!price) return 'N/A';
+      // Remove any existing currency symbols and convert to number
+      const numericValue = Number(String(price).replace(/[^0-9.-]+/g, ""));
+      // Format with DZD symbol and thousand separators
+      return `${numericValue.toLocaleString('ar-DZ')} DZD`;
+    };
+
     const viewPropertyDetails = () => {
       if (props.property.id) {
         router.push({ name: 'property-details', params: { id: props.property.id } });
@@ -204,7 +201,8 @@ export default {
       isFavorite,
       viewPropertyDetails,
       handleImageError,
-      toggleFavorite
+      toggleFavorite,
+      formatPrice
     };
   }
 }
