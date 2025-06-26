@@ -127,22 +127,46 @@
                   {{ userInitial }}
                 </button>
                 
-                <!-- Simple dropdown with just logout -->
-                <div 
-                  v-if="showUserMenu" 
-                  class="profile-dropdown origin-top-right absolute right-0 mt-2 w-32 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none z-50"
-                  @click.stop
+                <!-- Enhanced dropdown with dashboard and logout -->
+                <transition
+                  enter-active-class="transition ease-out duration-100"
+                  enter-from-class="transform opacity-0 scale-95"
+                  enter-to-class="transform opacity-100 scale-100"
+                  leave-active-class="transition ease-in duration-75"
+                  leave-from-class="transform opacity-100 scale-100"
+                  leave-to-class="transform opacity-0 scale-95"
                 >
-                  <div class="py-1" role="menu">
-                    <button
-                      @click="handleLogout"
-                      class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                      role="menuitem"
-                    >
-                      Logout
-                    </button>
+                  <div 
+                    v-if="showUserMenu" 
+                    class="origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none z-50"
+                    @click.stop
+                  >
+                    <div class="py-1" role="menu">
+                      <router-link
+                        to="/admin/dashboard"
+                        @click="showUserMenu = false"
+                        class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 flex items-center"
+                        role="menuitem"
+                      >
+                        <svg class="h-5 w-5 mr-2 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                        </svg>
+                        Dashboard
+                      </router-link>
+                      <div class="border-t border-gray-100 my-1"></div>
+                      <button
+                        @click="handleLogout"
+                        class="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 flex items-center"
+                        role="menuitem"
+                      >
+                        <svg class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                        </svg>
+                        Sign out
+                      </button>
+                    </div>
                   </div>
-                </div>
+                </transition>
               </div>
             </template>
           </div>
@@ -243,11 +267,66 @@ export default {
     const navHidden = ref(false);
     const showMobileSearch = ref(false);
     const showUserMenu = ref(false);
+    const isInitialized = ref(false);
+    
+    // Check for existing auth data in storage
+    const checkAuthStatus = async () => {
+      try {
+        // Check both localStorage and sessionStorage
+        const storedUser = localStorage.getItem('user') || sessionStorage.getItem('user');
+        const storedToken = localStorage.getItem('token') || sessionStorage.getItem('token');
+        
+        if (storedUser && storedToken) {
+          try {
+            const user = JSON.parse(storedUser);
+            // Use the checkAuth action instead of directly mutating state
+            await store.dispatch('auth/checkAuth', { 
+              user, 
+              token: storedToken 
+            });
+            // Set auth header for subsequent requests
+            if (axios && axios.defaults) {
+              axios.defaults.headers.common['Authorization'] = `Bearer ${storedToken}`;
+            }
+          } catch (e) {
+            console.error('Error parsing user data:', e);
+            store.dispatch('auth/logout');
+          }
+        } else if (store.getters['auth/isAuthenticated']) {
+          // If no token in storage but store thinks we're authenticated, log out
+          store.dispatch('auth/logout');
+        }
+      } catch (error) {
+        console.error('Auth check error:', error);
+      } finally {
+        isInitialized.value = true;
+      }
+    };
+    
+    // Initialize auth check
+    onMounted(() => {
+      checkAuthStatus();
+    });
     
     // Computed properties
-    const isAuthenticated = computed(() => store.getters['auth/isAuthenticated']);
+    const isAuthenticated = computed(() => {
+      // Only check the store, as it should be the source of truth
+      return store.getters['auth/isAuthenticated'];
+    });
+    
     const userInitial = computed(() => {
-      const user = store.state.auth.user;
+      // Get user from store first, then fall back to storage
+      let user = store.state.auth.user;
+      if (!user) {
+        try {
+          const storedUser = localStorage.getItem('user') || sessionStorage.getItem('user');
+          if (storedUser) {
+            user = JSON.parse(storedUser);
+          }
+        } catch (e) {
+          console.error('Error parsing stored user:', e);
+        }
+      }
       if (!user || !user.name) return 'U';
       return user.name
         .split(' ')
@@ -256,7 +335,20 @@ export default {
         .toUpperCase()
         .substring(0, 2);
     });
-    const userRole = computed(() => store.state.auth.user?.role || '');
+    const userRole = computed(() => {
+      if (store.state.auth.user?.role) {
+        return store.state.auth.user.role;
+      }
+      try {
+        const storedUser = localStorage.getItem('user') || sessionStorage.getItem('user');
+        if (storedUser) {
+          return JSON.parse(storedUser)?.role || '';
+        }
+      } catch (e) {
+        console.error('Error getting user role:', e);
+      }
+      return '';
+    });
     
     // Toggle user menu
     const toggleUserMenu = () => {

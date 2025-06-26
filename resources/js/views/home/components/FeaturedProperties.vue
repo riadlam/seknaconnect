@@ -265,8 +265,6 @@ export default {
     // Property filters
     const propertyFilters = [
       { id: 'all', label: 'All Properties' },
-      { id: 'sale', label: 'For Sale' },
-      { id: 'rent', label: 'For Rent' },
       { id: 'featured', label: 'Featured' },
       { id: 'new', label: 'New Listings' },
     ];

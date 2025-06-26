@@ -15,11 +15,11 @@ const apiClient = axios.create({
 // Request interceptor
 apiClient.interceptors.request.use(
   (config) => {
-    // You can add auth token here if needed
-    // const token = localStorage.getItem('token');
-    // if (token) {
-    //   config.headers.Authorization = `Bearer ${token}`;
-    // }
+    // Add auth token to every request
+    const token = localStorage.getItem('token');
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
     return config;
   },
   (error) => {
@@ -33,22 +33,53 @@ apiClient.interceptors.response.use(
     // Handle successful responses
     return response.data;
   },
-  (error) => {
-    // Handle errors
+  async (error) => {
+    const originalRequest = error.config;
+    
+    // Handle 401 Unauthorized errors
+    if (error.response?.status === 401 && !originalRequest._retry) {
+      // If this is a login request, just reject it
+      if (originalRequest.url.includes('/login') || originalRequest.url.includes('/refresh')) {
+        return Promise.reject(error);
+      }
+      
+      // Try to refresh the token
+      originalRequest._retry = true;
+      try {
+        // You can implement token refresh logic here if needed
+        // For now, we'll just redirect to login
+        if (window.location.pathname !== '/login') {
+          window.location.href = '/login';
+        }
+      } catch (refreshError) {
+        console.error('Token refresh failed:', refreshError);
+        if (window.location.pathname !== '/login') {
+          window.location.href = '/login';
+        }
+      }
+    }
+    
+    // Log other errors
     if (error.response) {
-      // The request was made and the server responded with a status code
-      // that falls out of the range of 2xx
       console.error('API Error:', {
         status: error.response.status,
         data: error.response.data,
-        headers: error.response.headers,
+        url: error.config.url,
+        method: error.config.method,
       });
+      
+      // Handle specific error cases
+      if (error.response.status === 403) {
+        console.error('Access forbidden - you may not have permission to access this resource');
+      } else if (error.response.status === 404) {
+        console.error('The requested resource was not found');
+      } else if (error.response.status >= 500) {
+        console.error('Server error - please try again later');
+      }
     } else if (error.request) {
-      // The request was made but no response was received
-      console.error('API Error: No response received', error.request);
+      console.error('No response received from server. Please check your connection.');
     } else {
-      // Something happened in setting up the request that triggered an Error
-      console.error('API Error:', error.message);
+      console.error('Request setup error:', error.message);
     }
     
     return Promise.reject(error);

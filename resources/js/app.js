@@ -115,15 +115,9 @@ const routes = [
       },
       {
         path: 'documents',
-        component: ProfessionalDashboard, // TODO: Create DocumentsList component
+        component: () => import('./views/admin/AllProjects.vue'),
         name: 'admin.documents',
-        meta: { title: 'Documents' }
-      },
-      {
-        path: 'settings',
-        component: ProfessionalDashboard, // TODO: Create Settings component
-        name: 'admin.settings',
-        meta: { title: 'Settings' }
+        meta: { title: 'All Projects' }
       },
       { 
         path: 'projects/:id/edit', 

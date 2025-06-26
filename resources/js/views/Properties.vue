@@ -68,96 +68,40 @@
 
             <!-- Price Range -->
             <div class="mb-6">
-              <h3 class="text-sm font-medium text-gray-700 mb-3">Price Range</h3>
-              <div class="flex items-center space-x-4">
+              <h3 class="text-sm font-medium text-gray-700 mb-3">Price Range (DZD)</h3>
+              <div class="flex items-center gap-3">
                 <div class="flex-1">
                   <label for="min-price" class="sr-only">Min price</label>
                   <div class="relative rounded-md shadow-sm">
                     <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                      <span class="text-gray-500 sm:text-sm">$</span>
+                      <span class="text-gray-500 text-sm">DZD</span>
                     </div>
                     <input
                       type="number"
                       id="min-price"
                       v-model.number="filters.minPrice"
                       placeholder="Min"
-                      class="focus:ring-purple-500 focus:border-purple-500 block w-full pl-7 pr-3 sm:text-sm border-gray-300 rounded-md"
+                      class="block w-full pl-16 pr-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 sm:text-sm"
+                      min="0"
                     >
                   </div>
                 </div>
+                <div class="text-gray-500 mt-1">-</div>
                 <div class="flex-1">
                   <label for="max-price" class="sr-only">Max price</label>
                   <div class="relative rounded-md shadow-sm">
                     <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                      <span class="text-gray-500 sm:text-sm">$</span>
+                      <span class="text-gray-500 text-sm">DZD</span>
                     </div>
                     <input
                       type="number"
                       id="max-price"
                       v-model.number="filters.maxPrice"
                       placeholder="Max"
-                      class="focus:ring-purple-500 focus:border-purple-500 block w-full pl-7 pr-3 sm:text-sm border-gray-300 rounded-md"
+                      class="block w-full pl-16 pr-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 sm:text-sm"
+                      :min="filters.minPrice || 0"
                     >
                   </div>
-                </div>
-              </div>
-            </div>
-
-            <!-- Bedrooms -->
-            <div class="mb-6">
-              <h3 class="text-sm font-medium text-gray-700 mb-3">Bedrooms</h3>
-              <div class="grid grid-cols-3 gap-2">
-                <button
-                  v-for="option in bedroomOptions"
-                  :key="option.value"
-                  @click="filters.bedrooms = option.value"
-                  type="button"
-                  class="py-2 px-3 text-center text-sm rounded-md border transition-colors"
-                  :class="{
-                    'bg-purple-600 text-white border-purple-600': filters.bedrooms === option.value,
-                    'bg-white text-gray-700 border-gray-300 hover:bg-gray-50': filters.bedrooms !== option.value
-                  }"
-                >
-                  {{ option.label }}
-                </button>
-              </div>
-            </div>
-
-            <!-- Bathrooms -->
-            <div class="mb-6">
-              <h3 class="text-sm font-medium text-gray-700 mb-3">Bathrooms</h3>
-              <div class="grid grid-cols-3 gap-2">
-                <button
-                  v-for="option in bathroomOptions"
-                  :key="option.value"
-                  @click="filters.bathrooms = option.value"
-                  type="button"
-                  class="py-2 px-3 text-center text-sm rounded-md border transition-colors"
-                  :class="{
-                    'bg-purple-600 text-white border-purple-600': filters.bathrooms === option.value,
-                    'bg-white text-gray-700 border-gray-300 hover:bg-gray-50': filters.bathrooms !== option.value
-                  }"
-                >
-                  {{ option.label }}
-                </button>
-              </div>
-            </div>
-
-            <!-- Features -->
-            <div class="mb-6">
-              <h3 class="text-sm font-medium text-gray-700 mb-3">Features</h3>
-              <div class="space-y-2">
-                <div v-for="feature in features" :key="feature.value" class="flex items-center">
-                  <input
-                    :id="`feature-${feature.value}`"
-                    v-model="filters.features"
-                    type="checkbox"
-                    :value="feature.value"
-                    class="h-4 w-4 text-purple-600 focus:ring-purple-500 border-gray-300 rounded"
-                  >
-                  <label :for="`feature-${feature.value}`" class="ml-3 text-sm text-gray-700">
-                    {{ feature.label }}
-                  </label>
                 </div>
               </div>
             </div>
@@ -167,48 +111,24 @@
         <!-- Property List -->
         <div class="flex-1">
           <!-- Sort and View Options -->
-          <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
+          <div class="flex flex-wrap items-center justify-between gap-2 mb-6 w-full">
             <p class="text-sm text-gray-600">
-              Showing <span class="font-medium">{{ filteredProperties.length }}</span> properties
+              <span class="hidden xs:inline">Showing</span> <span class="font-medium">{{ filteredProperties.length }}</span> <span class="hidden sm:inline">properties</span>
             </p>
-            <div class="flex items-center space-x-4">
-              <div class="flex items-center">
-                <label for="sort" class="mr-2 text-sm font-medium text-gray-700">Sort by:</label>
-                <select
-                  id="sort"
-                  v-model="sortOption"
-                  class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-purple-500 focus:border-purple-500 sm:text-sm rounded-md"
-                >
-                  <option value="featured">Featured</option>
-                  <option value="price-asc">Price: Low to High</option>
-                  <option value="price-desc">Price: High to Low</option>
-                  <option value="newest">Newest First</option>
-                </select>
-              </div>
-              <div class="hidden sm:flex items-center space-x-1">
-                <button
-                  @click="viewMode = 'grid'"
-                  type="button"
-                  class="p-2 rounded-md hover:bg-gray-100"
-                  :class="{ 'text-purple-600 bg-purple-50': viewMode === 'grid' }"
-                >
-                  <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
-                  </svg>
-                  <span class="sr-only">Grid view</span>
-                </button>
-                <button
-                  @click="viewMode = 'list'"
-                  type="button"
-                  class="p-2 rounded-md hover:bg-gray-100"
-                  :class="{ 'text-purple-600 bg-purple-50': viewMode === 'list' }"
-                >
-                  <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
-                  </svg>
-                  <span class="sr-only">List view</span>
-                </button>
-              </div>
+            <div class="flex items-center gap-2">
+              <label for="sort" class="text-sm text-gray-700 whitespace-nowrap">
+                Sort:
+              </label>
+              <select
+                id="sort"
+                v-model="sortOption"
+                class="text-sm border-gray-300 rounded-md focus:ring-purple-500 focus:border-purple-500 py-1.5"
+              >
+                <option value="featured">Featured</option>
+                <option value="price-asc">Price: Low to High</option>
+                <option value="price-desc">Price: High to Low</option>
+                <option value="newest">Newest</option>
+              </select>
             </div>
           </div>
 

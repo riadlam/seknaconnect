@@ -166,15 +166,46 @@ const actions = {
     }
   },
 
-  logout({ commit }) {
+  async logout({ commit }) {
+    try {
+      // Call your backend logout endpoint if needed
+      await axios.post('/api/logout');
+    } catch (error) {
+      console.error('Logout error:', error);
+      // Continue with client-side cleanup even if server logout fails
+    }
+    
+    // Clear all auth data
     localStorage.removeItem('token');
     localStorage.removeItem('user');
+    sessionStorage.removeItem('token');
+    sessionStorage.removeItem('user');
     delete axios.defaults.headers.common['Authorization'];
     commit('logout');
   },
 
   clearError({ commit }) {
     commit('clearError');
+  },
+  
+  async checkAuth({ commit }, { user, token }) {
+    try {
+      // Verify the token is still valid
+      const response = await axios.get('/api/user', {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      
+      if (response.data) {
+        // Token is valid, update auth state
+        commit('authSuccess', { user, token });
+        return true;
+      }
+    } catch (error) {
+      console.error('Auth check failed:', error);
+      // If token is invalid, clear auth state
+      commit('logout');
+      return false;
+    }
   }
 };
 

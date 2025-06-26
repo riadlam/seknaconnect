@@ -37,7 +37,7 @@
           </div>
         </div>
         <div class="mt-8 border-t border-gray-700 pt-8">
-          <p class="text-gray-400 text-sm text-center">&copy; 2023 SeknaConnect. All rights reserved.</p>
+          <p class="text-gray-400 text-sm text-center">&copy; 2025 SeknaConnect. All rights reserved.</p>
         </div>
       </div>
     </footer>

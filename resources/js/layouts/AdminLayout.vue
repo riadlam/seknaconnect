@@ -1,5 +1,17 @@
 <template>
-  <div class="min-h-screen bg-gray-50 flex flex-col md:flex-row">
+  <div v-if="isInitialized" class="min-h-screen bg-gray-50 flex flex-col md:flex-row">
+    <!-- Loading state -->
+    <div v-if="!isReady" class="fixed inset-0 bg-white bg-opacity-80 flex items-center justify-center z-50">
+      <div class="text-center">
+        <div class="inline-flex items-center px-4 py-2 font-semibold leading-6 text-sm shadow rounded-md text-white bg-purple-600">
+          <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+          </svg>
+          Loading...
+        </div>
+      </div>
+    </div>
     <!-- Mobile menu button -->
     <div class="md:hidden flex items-center justify-between p-4 bg-white border-b border-gray-200">
       <button 
@@ -51,7 +63,7 @@
               :class="[isActive(item.href) ? 'text-purple-500' : 'text-gray-400 group-hover:text-gray-500']" 
               aria-hidden="true" 
             />
-            {{ item.name }}
+            <span class="ml-2 text-sm font-medium text-gray-700 group-hover:text-gray-900">{{ item.name }}</span>
           </router-link>
         </nav>
       </div>
@@ -68,7 +80,7 @@
               class="mr-2 p-2 text-gray-500 hover:text-gray-600 hover:bg-gray-100 rounded-full md:hidden"
             >
               <Bars3Icon class="h-5 w-5" />
-              <span class="sr-only">Open sidebar</span>
+              <span class="ml-3">{{ userName }}</span>
             </button>
             <h1 class="text-lg font-medium text-gray-900">
               {{ pageTitle }}
@@ -83,15 +95,19 @@
             
             <!-- Profile dropdown -->
             <div class="relative ml-3">
-              <div>
+              <div ref="profileMenuRef" class="relative">
                 <button 
-                  @click="isProfileMenuOpen = !isProfileMenuOpen"
-                  class="flex items-center max-w-xs text-sm rounded-full focus:outline-none"
+                  @click.stop="isProfileMenuOpen = !isProfileMenuOpen"
+                  class="flex items-center max-w-xs text-sm rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500"
+                  :class="{ 'bg-gray-100': isProfileMenuOpen }"
                 >
                   <span class="sr-only">Open user menu</span>
                   <div class="h-8 w-8 rounded-full bg-purple-600 flex items-center justify-center text-white font-medium">
                     {{ userInitials }}
                   </div>
+                  <span class="ml-2 text-sm font-medium text-gray-700">
+                    {{ userName }}
+                  </span>
                 </button>
               </div>
               
@@ -105,35 +121,30 @@
                 leave-to-class="transform opacity-0 scale-95"
               >
                 <div 
-                  v-if="isProfileMenuOpen"
+                  v-show="isProfileMenuOpen"
                   class="origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none z-50"
                   role="menu"
                   tabindex="-1"
-                  v-click-outside="() => isProfileMenuOpen = false"
                 >
                   <div class="py-1" role="none">
                     <router-link 
                       to="/admin/profile" 
-                      class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                      class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900"
                       role="menuitem"
                       @click="isProfileMenuOpen = false"
                     >
-                      Your Profile
-                    </router-link>
-                    <router-link 
-                      to="/admin/settings" 
-                      class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                      role="menuitem"
-                      @click="isProfileMenuOpen = false"
-                    >
-                      Settings
+                      <div class="flex items-center">
+                        <span>Your Profile</span>
+                      </div>
                     </router-link>
                     <button
                       @click="logout"
-                      class="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                      class="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 hover:text-red-700"
                       role="menuitem"
                     >
-                      Sign out
+                      <div class="flex items-center">
+                        <span>Sign out</span>
+                      </div>
                     </button>
                   </div>
                 </div>
@@ -164,8 +175,9 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, watch, onUnmounted, onBeforeMount } from 'vue';
+import { ref, computed, onMounted, watch, onUnmounted, nextTick } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
+import { useStore } from 'vuex';
 import { 
   HomeIcon,
   UserGroupIcon,
@@ -183,10 +195,87 @@ import {
 
 const route = useRoute();
 const router = useRouter();
+const store = useStore();
+const isInitialized = ref(false);
+const isReady = ref(false);
+const isProfileMenuOpen = ref(false);
+const profileMenuRef = ref(null);
+
+// Close profile menu when clicking outside
+const handleClickOutside = (event) => {
+  if (profileMenuRef.value && !profileMenuRef.value.contains(event.target)) {
+    isProfileMenuOpen.value = false;
+  }
+};
+
+// Add click outside listener when component mounts
+onMounted(() => {
+  document.addEventListener('click', handleClickOutside);
+  checkAuth();
+});
+
+// Cleanup event listener
+onUnmounted(() => {
+  document.removeEventListener('click', handleClickOutside);
+  if (unwatch) unwatch();
+});
+
+// Clean up event listener
+onUnmounted(() => {
+  document.removeEventListener('click', handleClickOutside);
+});
+
+// Check authentication status
+const checkAuth = async () => {
+  try {
+    // Check if user is already authenticated in store
+    if (!store.getters['auth/isAuthenticated']) {
+      // Try to initialize from storage
+      const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+      const user = localStorage.getItem('user') || sessionStorage.getItem('user');
+      
+      if (token && user) {
+        await store.dispatch('auth/checkAuth', { token, user: JSON.parse(user) });
+      } else {
+        // No valid session found
+        if (!route.path.includes('/login')) {
+          return router.push('/login');
+        }
+        return;
+      }
+    }
+    
+    // If not authenticated and not on login page, redirect to login
+    if (!store.getters['auth/isAuthenticated'] && !route.path.includes('/login')) {
+      return router.push('/login');
+    }
+    
+    // If authenticated and on login page, redirect to dashboard
+    if (store.getters['auth/isAuthenticated'] && route.path === '/login') {
+      return router.push('/dashboard');
+    }
+    
+    isReady.value = true;
+  } catch (error) {
+    console.error('Auth check failed:', error);
+    if (!route.path.includes('/login')) {
+      router.push('/login');
+    }
+  } finally {
+    isInitialized.value = true;
+  }
+};
+
+// Watch for route changes to check auth
+watch(() => route.path, async () => {
+  if (!isInitialized.value) return;
+  await checkAuth();
+});
+
+
 
 // State
 const isMobileMenuOpen = ref(false);
-const isProfileMenuOpen = ref(false);
 const pageTitle = ref('Dashboard');
 
 // Watch for route changes to update page title
@@ -194,15 +283,31 @@ watch(() => route.meta, (newMeta) => {
   pageTitle.value = newMeta.title || 'Dashboard';
 }, { immediate: true });
 
-// Navigation items
-const navigation = [
-  { name: 'Dashboard', href: '/admin/dashboard', icon: 'HomeIcon' },
-  { name: 'Projects', href: '/admin/projects', icon: 'HomeModernIcon' },
-  { name: 'Inquiries', href: '/admin/inquiries', icon: 'UserGroupIcon' },
-  { name: 'Users', href: '/admin/users', icon: 'UserGroupIcon' },
-  { name: 'Documents', href: '/admin/documents', icon: 'DocumentTextIcon' },
-  { name: 'Settings', href: '/admin/settings', icon: 'Cog6ToothIcon' },
-];
+// Navigation items based on user role and authentication
+const navigation = computed(() => {
+  // If not authenticated, return empty array
+  if (!store.getters['auth/isAuthenticated']) {
+    return [];
+  }
+  
+  // Get user role
+  const userRole = store.getters['auth/currentUser']?.role;
+  
+  const adminNav = [
+    { name: 'Dashboard', href: '/admin/dashboard', icon: 'HomeIcon' },
+    { name: 'Users', href: '/admin/users', icon: 'UserGroupIcon' },
+    { name: 'All Projects', href: '/admin/documents', icon: 'DocumentTextIcon' },
+  ];
+  
+  const professionalNav = [
+    { name: 'Dashboard', href: '/admin/dashboard', icon: 'HomeIcon' },
+    { name: 'Projects', href: '/admin/projects', icon: 'HomeModernIcon' },
+    { name: 'Inquiries', href: '/admin/inquiries', icon: 'UserGroupIcon' },
+  ];
+  
+  // Default to admin navigation if role is not recognized
+  return userRole === 'professional' ? professionalNav : adminNav;
+});
 
 // Dynamic component for icons
 const getIconComponent = (iconName) => {
@@ -230,8 +335,13 @@ const isActive = (path) => {
 
 // Get user initials for avatar
 const userInitials = computed(() => {
-  // Replace with actual user data
-  const name = 'Admin User';
+  const user = store.getters['auth/currentUser'];
+  if (!user) return 'U';
+  
+  if (user.name) {
+    return user.name.split(' ').map(n => n[0]).join('').toUpperCase().substring(0, 2);
+  }
+  return user.email ? user.email[0].toUpperCase() : 'U';
   return name
     .split(' ')
     .map(part => part[0])
@@ -240,11 +350,16 @@ const userInitials = computed(() => {
     .substring(0, 2);
 });
 
+// Get user display name
+const userName = computed(() => {
+  const user = store.getters['auth/currentUser'];
+  return user?.name || user?.email || 'User';
+});
+
 // Logout function
 const logout = async () => {
   try {
-    // Add your logout logic here
-    // await authStore.logout();
+    await store.dispatch('auth/logout');
     router.push('/login');
   } catch (error) {
     console.error('Logout failed:', error);
