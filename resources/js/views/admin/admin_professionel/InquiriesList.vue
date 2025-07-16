@@ -5,10 +5,10 @@
       <div class="md:flex md:items-center md:justify-between mb-8">
         <div class="flex-1 min-w-0">
           <h1 class="text-2xl font-bold leading-7 text-gray-900 sm:text-3xl sm:truncate">
-            Property Inquiries
+Demandes de renseignements
           </h1>
           <p class="mt-1 text-sm text-gray-500">
-            Manage and respond to property inquiries from potential clients
+Gérez et répondez aux demandes de renseignements des clients potentiels
           </p>
         </div>
         <div class="mt-4 flex md:mt-0 md:ml-4">
@@ -24,7 +24,7 @@
             <svg v-else class="-ml-1 mr-2 h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
             </svg>
-            {{ loading ? 'Refreshing...' : 'Refresh' }}
+            {{ loading ? 'Actualisation...' : 'Actualiser' }}
           </button>
         </div>
       </div>
@@ -46,14 +46,14 @@
         <svg class="mx-auto h-16 w-16 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
         </svg>
-        <h3 class="mt-4 text-lg font-medium text-gray-900">No inquiries yet</h3>
-        <p class="mt-1 text-sm text-gray-500">Your property inquiries will appear here when clients contact you.</p>
+        <h3 class="mt-4 text-lg font-medium text-gray-900">Aucune demande pour le moment</h3>
+        <p class="mt-1 text-sm text-gray-500">Vos demandes de renseignements s'afficheront ici lorsque les clients vous contacteront.</p>
         <div class="mt-6">
           <button @click="fetchInquiries" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
             <svg class="-ml-1 mr-2 h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
               <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd" />
             </svg>
-            Refresh
+            Actualiser
           </button>
         </div>
       </div>
@@ -119,7 +119,7 @@
                     </svg>
                   </div>
                   <div class="ml-3">
-                    <p class="text-sm font-medium text-gray-500">Project</p>
+                    <p class="text-sm font-medium text-gray-500">Projet</p>
                     <p class="text-sm font-medium text-gray-900">{{ inquiry.project.name }}</p>
                   </div>
                 </div>
@@ -131,7 +131,7 @@
                     </svg>
                   </div>
                   <div class="ml-3">
-                    <p class="text-sm font-medium text-gray-500">Location</p>
+                    <p class="text-sm font-medium text-gray-500">Localisation</p>
                     <p class="text-sm text-gray-900">{{ inquiry.project.location }}</p>
                   </div>
                 </div>
@@ -142,7 +142,7 @@
                     </svg>
                   </div>
                   <div class="ml-3">
-                    <p class="text-sm font-medium text-gray-500">Property Type</p>
+                    <p class="text-sm font-medium text-gray-500">Type de bien</p>
                     <p class="text-sm text-gray-900">{{ inquiry.project.housing_type }}</p>
                   </div>
                 </div>
@@ -154,7 +154,7 @@
                     </svg>
                   </div>
                   <div class="ml-3">
-                    <p class="text-sm font-medium text-gray-500">Price</p>
+                    <p class="text-sm font-medium text-gray-500">Prix</p>
                     <p class="text-sm text-gray-900">${{ Number(inquiry.project.price).toLocaleString() }}</p>
                   </div>
                 </div>
@@ -165,7 +165,7 @@
                     </svg>
                   </div>
                   <div class="ml-3">
-                    <p class="text-sm font-medium text-gray-500">Surface Area</p>
+                    <p class="text-sm font-medium text-gray-500">Surface</p>
                     <p class="text-sm text-gray-900">{{ Number(inquiry.project.surface_area).toLocaleString() }} m²</p>
                   </div>
                 </div>
@@ -176,7 +176,7 @@
                     </svg>
                   </div>
                   <div class="ml-3">
-                    <p class="text-sm font-medium text-gray-500">Delivery Date</p>
+                    <p class="text-sm font-medium text-gray-500">Date de livraison</p>
                     <p class="text-sm text-gray-900">{{ formatDate(inquiry.project.delivery_date) }}</p>
                   </div>
                 </div>
@@ -192,7 +192,7 @@
               <svg class="mr-2 h-4 w-4 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
               </svg>
-              Reply via Email
+              Répondre par email
             </button>
           </div>
         </div>
@@ -218,7 +218,7 @@ const fetchInquiries = async () => {
     inquiries.value = response.data;
   } catch (err) {
     console.error('Error fetching inquiries:', err);
-    error.value = 'Failed to load inquiries. Please try again.';
+    error.value = 'Échec du chargement des demandes. Veuillez réessayer.';
   } finally {
     loading.value = false;
   }

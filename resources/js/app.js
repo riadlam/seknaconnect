@@ -18,7 +18,7 @@ import InquiriesList from './views/admin/admin_professionel/InquiriesList.vue';
 import UsersList from './views/admin/admin_professionel/UsersList.vue';
 
 // Set base URL for API requests
-axios.defaults.baseURL = 'http://192.168.1.8:8000';
+axios.defaults.baseURL = 'http://192.168.1.15:8000';
 
 // Add a request interceptor to include the token in all requests
 axios.interceptors.request.use(

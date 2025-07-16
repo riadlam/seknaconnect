@@ -1,7 +1,7 @@
 export default {
   // API Configuration
   api: {
-    baseURL: 'http://192.168.1.8:8000/api',
+    baseURL: 'http://192.168.1.15:8000/api',
     timeout: 10000, // 10 seconds
     endpoints: {
       projects: '/projects',
@@ -35,5 +35,5 @@ export default {
 export const getImageUrl = (path) => {
   if (!path) return '';
   if (path.startsWith('http')) return path;
-  return `http://192.168.1.8:8000${path}`;
+  return `http://192.168.1.15:8000${path}`;
 };

@@ -2,8 +2,8 @@
   <div class="px-4 sm:px-6 lg:px-8">
     <div class="sm:flex sm:items-center">
       <div class="sm:flex-auto">
-        <h1 class="text-xl font-semibold text-gray-900">Projects</h1>
-        <p class="mt-2 text-sm text-gray-700">A list of all property projects in the system.</p>
+        <h1 class="text-xl font-semibold text-gray-900">Projets</h1>
+        <p class="mt-2 text-sm text-gray-700">Liste de tous les projets immobiliers dans le système.</p>
       </div>
       <div class="mt-4 sm:mt-0 sm:ml-16 sm:flex-none">
         <button
@@ -13,7 +13,7 @@
           <svg xmlns="http://www.w3.org/2000/svg" class="-ml-1 mr-2 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
           </svg>
-          Add Project
+Ajouter un projet
         </button>
       </div>
     </div>
@@ -24,7 +24,7 @@
             <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
             <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
           </svg>
-          Loading projects...
+Chargement des projets...
         </div>
       </div>
 
@@ -39,8 +39,8 @@
           <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
           </svg>
-          <h3 class="mt-2 text-sm font-medium text-gray-900">No projects</h3>
-          <p class="mt-1 text-sm text-gray-500">Get started by creating a new project.</p>
+          <h3 class="mt-2 text-sm font-medium text-gray-900">Aucun projet</h3>
+          <p class="mt-1 text-sm text-gray-500">Commencez par créer un nouveau projet.</p>
           <div class="mt-6">
             <button
               type="button"
@@ -50,7 +50,7 @@
               <svg class="-ml-1 mr-2 h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
                 <path fill-rule="evenodd" d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z" clip-rule="evenodd" />
               </svg>
-              New Project
+Nouveau projet
             </button>
           </div>
         </div>
@@ -65,10 +65,10 @@
               <thead class="bg-gray-50">
                 <tr>
                   <th scope="col" class="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6">ID</th>
-                  <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Name</th>
-                  <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Housing Type</th>
-                  <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Units</th>
-                  <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Location</th>
+                  <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Nom</th>
+                  <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Type de bien</th>
+                  <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Unités</th>
+                  <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Date de livraison</th>
                   <th scope="col" class="relative py-3.5 pl-3 pr-4 sm:pr-6">
                     <span class="sr-only">Actions</span>
                   </th>
@@ -84,7 +84,7 @@
                       </div>
                       <div class="ml-4">
                         <div class="font-medium text-gray-900">{{ project.name }}</div>
-                        <div class="text-gray-500">{{ project.location }}</div>
+                        <div class="text-gray-500">{{ formatLocation(project.location) }}</div>
                       </div>
                     </div>
                   </td>
@@ -100,21 +100,14 @@
                     </span>
                   </td>
                   <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                    {{ project.num_units }} {{ project.num_units === 1 ? 'unit' : 'units' }}
+                    {{ project.num_units }} {{ project.num_units === 1 ? 'unité' : 'unités' }}
                   </td>
                   <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                    <div class="flex items-center">
-                      <svg class="h-4 w-4 text-gray-400 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                      </svg>
-                      {{ project.location }}
-                    </div>
                     <div class="text-xs text-gray-400 mt-1">
                       <span v-if="project.delivery_date">
-                        Delivery: {{ new Date(project.delivery_date).toLocaleDateString() }}
+                        Livraison : {{ new Date(project.delivery_date).toLocaleDateString('fr-FR') }}
                       </span>
-                      <span v-else class="text-yellow-600">No delivery date</span>
+                      <span v-else class="text-yellow-600">Pas de date de livraison</span>
                     </div>
                   </td>
                   <td class="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">
@@ -128,7 +121,7 @@
                           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                         </svg>
-                        View
+Voir
                       </router-link>
                       <button 
                         @click="editProject(project)" 
@@ -138,7 +131,7 @@
                         <svg class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                         </svg>
-                        Edit
+Modifier
                       </button>
                       <button 
                         @click="deleteProject(project.id)" 
@@ -148,83 +141,20 @@
                         <svg class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                         </svg>
-                        Delete
+Supprimer
                       </button>
                     </div>
                   </td>
                 </tr>
                 <tr v-if="projects.length === 0">
                   <td colspan="6" class="px-6 py-4 text-center text-sm text-gray-500">
-                    No projects found.
+Aucun projet trouvé.
                   </td>
                 </tr>
               </tbody>
             </table>
           </div>
-          <!-- Pagination -->
-          <div class="mt-4 flex items-center justify-between border-t border-gray-200 px-4 py-3 sm:px-6">
-            <div class="flex flex-1 justify-between sm:hidden">
-              <button 
-                @click="currentPage > 1 ? currentPage-- : null"
-                :disabled="currentPage === 1"
-                class="relative inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
-              >
-                Previous
-              </button>
-              <button 
-                @click="currentPage < totalPages ? currentPage++ : null"
-                :disabled="currentPage === totalPages"
-                class="relative ml-3 inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
-              >
-                Next
-              </button>
-            </div>
-            <div class="hidden sm:flex sm:flex-1 sm:items-center sm:justify-between">
-              <div>
-                <p class="text-sm text-gray-700">
-                  Showing <span class="font-medium">{{ (currentPage - 1) * perPage + 1 }}</span>
-                  to <span class="font-medium">{{ Math.min(currentPage * perPage, totalItems) }}</span>
-                  of <span class="font-medium">{{ totalItems }}</span> results
-                </p>
-              </div>
-              <div>
-                <nav class="isolate inline-flex -space-x-px rounded-md shadow-sm" aria-label="Pagination">
-                  <button
-                    @click="currentPage > 1 ? currentPage-- : null"
-                    :disabled="currentPage === 1"
-                    :class="{ 'opacity-50 cursor-not-allowed': currentPage === 1 }"
-                    class="relative inline-flex items-center rounded-l-md border border-gray-300 bg-white px-2 py-2 text-sm font-medium text-gray-500 hover:bg-gray-50 focus:z-20"
-                  >
-                    <span class="sr-only">Previous</span>
-                    <ChevronLeftIcon class="h-5 w-5" aria-hidden="true" />
-                  </button>
-                  <button
-                    v-for="page in visiblePages"
-                    :key="page"
-                    @click="currentPage = page"
-                    :class="[
-                      page === currentPage 
-                        ? 'z-10 bg-purple-50 border-purple-500 text-purple-600' 
-                        : 'bg-white border-gray-300 text-gray-500 hover:bg-gray-50',
-                      'relative inline-flex items-center border px-4 py-2 text-sm font-medium focus:z-20'
-                    ]"
-                    :aria-current="page === currentPage ? 'page' : undefined"
-                  >
-                    {{ page }}
-                  </button>
-                  <button
-                    @click="currentPage < totalPages ? currentPage++ : null"
-                    :disabled="currentPage === totalPages"
-                    :class="{ 'opacity-50 cursor-not-allowed': currentPage === totalPages }"
-                    class="relative inline-flex items-center rounded-r-md border border-gray-300 bg-white px-2 py-2 text-sm font-medium text-gray-500 hover:bg-gray-50 focus:z-20"
-                  >
-                    <span class="sr-only">Next</span>
-                    <ChevronRightIcon class="h-5 w-5" aria-hidden="true" />
-                  </button>
-                </nav>
-              </div>
-            </div>
-          </div>
+
         </div>
       </div>
     </div>
@@ -244,6 +174,7 @@ import { ref, computed, onMounted } from 'vue';
 import { ChevronLeftIcon, ChevronRightIcon } from '@heroicons/vue/20/solid';
 import AddProjectDialog from '../../../components/projects/AddProjectDialog.vue';
 import axios from 'axios';
+import { useStore } from 'vuex';
 
 const projects = ref([]);
 const isLoading = ref(true);
@@ -282,6 +213,25 @@ const paginatedProjects = computed(() => {
   return projects.value.slice(start, end);
 });
 
+// Format location display
+const formatLocation = (location) => {
+  if (!location) return '';
+  
+  try {
+    const locationObj = typeof location === 'string' ? JSON.parse(location) : location;
+    const parts = [
+      locationObj.daira,
+      locationObj.commune,
+      locationObj.wilaya
+    ].filter(Boolean);
+    
+    return parts.join(', ');
+  } catch (e) {
+    console.warn('Error formatting location:', e);
+    return location;
+  }
+};
+
 // Format price with thousands separator
 const formatPrice = (price) => {
   if (!price) return 'N/A';
@@ -303,12 +253,12 @@ const formatDate = (dateString) => {
 
 // Delete project function
 const deleteProject = async (id) => {
-  if (!confirm('Are you sure you want to delete this project?')) return;
+  if (!confirm('Êtes-vous sûr de vouloir supprimer ce projet ?')) return;
   
   try {
-    const token = localStorage.getItem('token');
+    const token = store.state.auth.token;
     if (!token) {
-      throw new Error('Authentication token not found. Please log in again.');
+      throw new Error('Veuillez vous reconnecter');
     }
     
     await axios.delete(`/api/projects/${id}`, {
@@ -322,20 +272,22 @@ const deleteProject = async (id) => {
     projects.value = projects.value.filter(project => project.id !== id);
     
     // Show success message or toast
-    alert('Project deleted successfully!');
+    alert('Projet supprimé avec succès !');
   } catch (error) {
     console.error('Error deleting project:', error);
-    alert('Failed to delete project. Please try again.');
+    const errorMessage = error.response?.data?.message || 'Échec de la suppression du projet. Veuillez réessayer.';
+    alert(errorMessage);
   }
 };
 
 const openAddProjectDialog = (project = null) => {
-  currentProject.value = project;
+  isEditing.value = false;
+  currentProject.value = null;
   showAddDialog.value = true;
 };
 
 const handleAddProject = (projectData) => {
-  if (isEditing.value) {
+  if (projectData.id) {
     // Update existing project in the list
     const index = projects.value.findIndex(p => p.id === projectData.id);
     if (index !== -1) {
@@ -350,16 +302,20 @@ const handleAddProject = (projectData) => {
 };
 
 const editProject = (project) => {
-  openAddProjectDialog(project);
+  isEditing.value = true;
+  currentProject.value = project;
+  showAddDialog.value = true;
 };
 
 // Fetch projects from API
+const store = useStore();
+
 const fetchProjects = async () => {
   isLoading.value = true;
   error.value = null;
   
   try {
-    const token = localStorage.getItem('token');
+    const token = store.state.auth.token;
     if (!token) {
       throw new Error('Authentication token not found. Please log in again.');
     }
@@ -374,7 +330,7 @@ const fetchProjects = async () => {
     projects.value = response.data;
   } catch (err) {
     console.error('Error fetching projects:', err);
-    error.value = 'Failed to load projects. Please try again later.';
+    error.value = 'Échec du chargement des projets. Veuillez réessayer plus tard.';
   } finally {
     isLoading.value = false;
   }

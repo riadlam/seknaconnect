@@ -2,8 +2,8 @@
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
     <div class="sm:flex sm:items-center">
       <div class="sm:flex-auto">
-        <h1 class="text-2xl font-semibold text-gray-900">All Projects</h1>
-        <p class="mt-2 text-sm text-gray-600">A list of all projects in the system.</p>
+        <h1 class="text-2xl font-semibold text-gray-900">Tous les projets</h1>
+        <p class="mt-2 text-sm text-gray-600">Liste de tous les projets dans le système.</p>
       </div>
     </div>
     
@@ -14,7 +14,7 @@
           <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
           <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
         </svg>
-        Loading projects...
+Chargement des projets...
       </div>
     </div>
 
@@ -42,12 +42,12 @@
             <table class="min-w-full divide-y divide-gray-300">
               <thead class="bg-gray-50">
                 <tr>
-                  <th scope="col" class="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6">Project</th>
+                  <th scope="col" class="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6">Projet</th>
                   <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Type</th>
-                  <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Location</th>
-                  <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Price</th>
-                  <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Units</th>
-                  <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Delivery</th>
+                  <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Localisation</th>
+                  <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Prix</th>
+                  <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Unités</th>
+                  <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Livraison</th>
                   <th scope="col" class="relative py-3.5 pl-3 pr-4 sm:pr-6">
                     <span class="sr-only">Actions</span>
                   </th>
@@ -84,7 +84,7 @@
                     {{ formatDate(project.delivery_date) }}
                   </td>
                   <td class="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">
-                    <button @click="viewProject(project)" class="text-indigo-600 hover:text-indigo-900 mr-4">View</button>
+                    <button @click="viewProject(project)" class="text-indigo-600 hover:text-indigo-900 mr-4">Voir</button>
                   </td>
                 </tr>
               </tbody>
@@ -106,7 +106,7 @@ const error = ref(null);
 
 // Format price with thousands separator in DZD
 const formatPrice = (price) => {
-  if (!price) return 'N/A';
+  if (!price) return 'N/D';
   return new Intl.NumberFormat('ar-DZ', {
     style: 'decimal',
     minimumFractionDigits: 2,
@@ -116,7 +116,7 @@ const formatPrice = (price) => {
 
 // Format date
 const formatDate = (dateString) => {
-  if (!dateString) return 'N/A';
+  if (!dateString) return 'N/D';
   const options = { year: 'numeric', month: 'short', day: 'numeric' };
   return new Date(dateString).toLocaleDateString(undefined, options);
 };
@@ -149,7 +149,7 @@ const fetchProjects = async () => {
     projects.value = response.data;
   } catch (err) {
     console.error('Error fetching projects:', err);
-    error.value = 'Failed to load projects. Please try again later.';
+    error.value = 'Échec du chargement des projets. Veuillez réessayer plus tard.';
   } finally {
     loading.value = false;
   }

@@ -9,6 +9,66 @@ use App\Models\Project;
 class ProjectController extends Controller
 {
     /**
+     * Search projects by name (partial match)
+     *
+     * @OA\Get(
+     *     path="/api/projects/search",
+     *     summary="Search projects by name",
+     *     tags={"Projects"},
+     *     @OA\Parameter(
+     *         name="q",
+     *         in="query",
+     *         description="Search string for project name",
+     *         required=true,
+     *         @OA\Schema(type="string")
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="List of matching projects",
+     *         @OA\JsonContent(type="array", @OA\Items(ref="#/components/schemas/Project"))
+     *     )
+     * )
+     */
+    public function searchByName(Request $request)
+    {
+        $q = $request->input('q');
+        if (!$q) {
+            return response()->json(['error' => 'Missing q parameter'], 422);
+        }
+        $projects = \App\Models\Project::with(['images', 'user', 'inquiries'])
+            ->where('name', 'like', "%{$q}%")
+            ->whereHas('user', function($query) {
+                $query->where('is_verified', 1);
+            })
+            ->get();
+
+        $result = $projects->map(function ($project) {
+            return [
+                'id' => $project->id,
+                'name' => $project->name,
+                'location' => $project->location,
+                'price' => $project->price,
+                'images' => $project->images->map(function ($img) {
+                    return [
+                        'id' => $img->id,
+                        'image_path' => $img->image_path,
+                        'caption' => $img->caption
+                    ];
+                }),
+                'surface_area' => $project->surface_area,
+                'housing_type' => $project->housing_type,
+                'description' => $project->description,
+                'delivery_date' => $project->delivery_date,
+                'bedrooms' => $project->bedrooms ?? null,
+                'bathrooms' => $project->bathrooms ?? null,
+                'featured' => $project->featured ?? false,
+                'user' => $project->user,
+            ];
+        });
+        return response()->json($result);
+    }
+
+    /**
      * @OA\Get(
      *     path="/api/projects",
      *     summary="Get all projects with optional filtering",
@@ -62,7 +122,10 @@ class ProjectController extends Controller
      */
     public function index(Request $request)
     {
-        $query = Project::with(['images', 'user']);
+        $query = Project::with(['images', 'user'])
+            ->whereHas('user', function($q) {
+                $q->where('is_verified', 1);
+            });
 
         if ($request->has('housing_type')) {
             $query->where('housing_type', $request->housing_type);
@@ -140,7 +203,10 @@ class ProjectController extends Controller
             'name' => 'required|string|max:255',
             'housing_type' => 'required|string|max:100',
             'num_units' => 'required|integer|min:1',
-            'location' => 'required|string|max:255',
+            'location' => 'required|array',
+            'location.wilaya' => 'required|string|max:255',
+            'location.commune' => 'required|string|max:255',
+            'location.daira' => 'required|string|max:255',
             'delivery_date' => 'required|date|after:today',
             'price' => 'required|numeric|min:0',
             'surface_area' => 'required|numeric|min:0',
@@ -151,6 +217,9 @@ class ProjectController extends Controller
             'captions.*' => 'nullable|string|max:255'
         ]);
 
+        // Convert location array to JSON string for storage
+        $validated['location'] = json_encode($validated['location']);
+
         // Create the project
         $project = $request->user()->projects()->create($validated);
 
@@ -160,15 +229,17 @@ class ProjectController extends Controller
                 // Generate a unique filename with timestamp
                 $filename = uniqid() . '.' . $image->getClientOriginalExtension();
                 
-                // Store the file in the public disk with the desired path
-                $path = $image->storeAs('project-images', $filename, 'public');
-                
+                // Store the file directly in public/storage/project-images
+                $publicPath = public_path('storage/project-images');
+                if (!file_exists($publicPath)) {
+                    mkdir($publicPath, 0777, true);
+                }
+                $image->move($publicPath, $filename);
                 $caption = isset($validated['captions'][$index]) 
                     ? $validated['captions'][$index] 
                     : null;
-                
                 $project->images()->create([
-                    'image_path' => '/storage/' . $path, // Match the format used in ProjectImageController
+                    'image_path' => '/storage/project-images/' . $filename,
                     'caption' => $caption
                 ]);
             }
@@ -240,12 +311,20 @@ class ProjectController extends Controller
             'name' => 'sometimes|required|string|max:255',
             'housing_type' => 'sometimes|required|string|max:100',
             'num_units' => 'sometimes|required|integer|min:1',
-            'location' => 'sometimes|required|string|max:255',
+            'location' => 'sometimes|required|array',
+            'location.wilaya' => 'required_with:location|string|max:255',
+            'location.commune' => 'required_with:location|string|max:255',
+            'location.daira' => 'required_with:location|string|max:255',
             'delivery_date' => 'sometimes|required|date|after:today',
             'price' => 'sometimes|required|numeric|min:0',
             'surface_area' => 'sometimes|required|numeric|min:0',
             'description' => 'nullable|string'
         ]);
+
+        // Convert location array to JSON string if present
+        if (isset($validated['location'])) {
+            $validated['location'] = json_encode($validated['location']);
+        }
 
         $project->update($validated);
         $project->load(['images', 'user']);

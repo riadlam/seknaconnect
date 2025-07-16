@@ -4,7 +4,7 @@
       <div v-if="isLoading" class="min-h-screen flex items-center justify-center">
         <div class="text-center">
           <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mx-auto"></div>
-          <p class="mt-4 text-gray-600">Loading property details...</p>
+          <p class="mt-4 text-gray-600">Chargement des détails du bien...</p>
         </div>
       </div>
   
@@ -12,13 +12,13 @@
       <div v-else-if="error" class="min-h-screen flex items-center justify-center">
         <div class="text-center max-w-md p-6 bg-white rounded-lg shadow-md">
           <div class="text-red-500 text-5xl mb-4">⚠️</div>
-          <h2 class="text-2xl font-bold text-gray-800 mb-2">Error Loading Property</h2>
+          <h2 class="text-2xl font-bold text-gray-800 mb-2">Erreur lors du chargement du bien</h2>
           <p class="text-gray-600 mb-6">{{ error }}</p>
           <button 
             @click="fetchProperty"
             class="px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700 transition-colors"
           >
-            Try Again
+            Réessayer
           </button>
         </div>
       </div>
@@ -51,7 +51,7 @@
               @load="onImageLoad"
             >
             <div v-else class="w-full h-full bg-gray-200 flex items-center justify-center">
-              <span class="text-gray-400">No image available</span>
+              <span class="text-gray-400">Aucune image disponible</span>
             </div>
             <div v-if="!imageLoaded" class="absolute inset-0 bg-gray-200 animate-pulse"></div>
           </div>
@@ -86,23 +86,23 @@
                   <span v-if="property.pricePer" class="ml-2 text-gray-500">/ {{ property.pricePer }}</span>
                 </div>
                 <div class="mt-3 flex items-center text-sm text-gray-500">
-                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                   </svg>
-                  <span>{{ property.location || 'Location not specified' }}</span>
+                  <span class="line-clamp-1">{{ formatLocation(property.location) || 'Localisation non spécifiée' }}</span>
                 </div>
               </div>
   
               <!-- Highlights -->
               <div class="py-6 border-b border-gray-200">
-                <h2 class="text-lg font-medium text-gray-900 mb-4">Property Details</h2>
+                <h2 class="text-lg font-medium text-gray-900 mb-4">Détails du bien</h2>
                 <div class="grid grid-cols-2 gap-4">
                   <div class="flex items-center">
                     <svg class="h-5 w-5 text-green-500 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
                     </svg>
-                    <span class="text-gray-600">{{ property.housingType || 'N/A' }}</span>
+                    <span class="text-gray-600">{{ property.housingType || 'Non spécifié' }}</span>
                   </div>
                   <div class="flex items-center">
                     <svg class="h-5 w-5 text-green-500 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -114,13 +114,13 @@
                     <svg class="h-5 w-5 text-green-500 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                     </svg>
-                    <span class="text-gray-600">Delivery: {{ property.deliveryDate || 'N/A' }}</span>
+                    <span class="text-gray-600">Livraison : {{ property.deliveryDate || 'Non spécifiée' }}</span>
                   </div>
                   <div class="flex items-center">
                     <svg class="h-5 w-5 text-green-500 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
-                    <span class="text-gray-600">Posted: {{ new Date(property.createdAt).toLocaleDateString() }}</span>
+                    <span class="text-gray-600">Publié le : {{ new Date(property.createdAt).toLocaleDateString('fr-FR') }}</span>
                   </div>
                 </div>
               </div>
@@ -128,7 +128,7 @@
               <!-- Description -->
               <div class="py-6 border-b border-gray-200">
                 <h2 class="text-lg font-medium text-gray-900 mb-4">Description</h2>
-                <p class="text-gray-600 whitespace-pre-line">{{ property.description || 'No description available.' }}</p>
+                <p class="text-gray-600 whitespace-pre-line">{{ property.description || 'Aucune description disponible.' }}</p>
               </div>
             </div>
   
@@ -136,15 +136,15 @@
             <div class="mt-8 lg:mt-0">
               <div class="bg-white rounded-lg shadow-md overflow-hidden border border-gray-100">
                 <div class="bg-gradient-to-r from-purple-600 to-indigo-600 p-6 text-white">
-                  <h3 class="text-xl font-semibold">Interested in this property?</h3>
-                  <p class="mt-1 text-purple-100">Contact the seller for more information</p>
+                  <h3 class="text-xl font-semibold">Intéressé par ce bien ?</h3>
+                  <p class="mt-1 text-purple-100">Contactez le vendeur pour plus d'informations</p>
                 </div>
                 <div class="p-4 sm:p-6">
                   <form @submit.prevent="submitInquiry" class="space-y-5 relative" :class="{ 'opacity-50': isSubmitting }">
                     <div v-if="isSubmitting" class="absolute inset-0 bg-white/80 backdrop-blur-sm flex items-center justify-center z-10 rounded-lg">
                       <div class="bg-white p-4 rounded-lg shadow-lg flex flex-col items-center">
                         <div class="animate-spin rounded-full h-10 w-10 border-t-2 border-b-2 border-purple-600"></div>
-                        <p class="mt-2 text-sm text-gray-600">Sending your message...</p>
+                        <p class="mt-2 text-sm text-gray-600">Envoi de votre message...</p>
                       </div>
                     </div>
                     
@@ -152,7 +152,7 @@
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <!-- Name Field -->
                       <div class="space-y-1">
-                        <label for="name" class="block text-sm font-medium text-gray-700">Full Name <span class="text-red-500">*</span></label>
+                        <label for="name" class="block text-sm font-medium text-gray-700">Nom complet <span class="text-red-500">*</span></label>
                         <div class="relative mt-1 rounded-md shadow-sm">
                           <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                             <svg class="h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
@@ -166,14 +166,14 @@
                             :disabled="isSubmitting"
                             required
                             class="focus:ring-purple-500 focus:border-purple-500 block w-full pl-10 sm:text-sm border-gray-300 rounded-md py-3 border"
-                            placeholder="John Doe"
+                            placeholder="Votre nom complet"
                           >
                         </div>
                       </div>
                       
                       <!-- Email Field -->
                       <div class="space-y-1">
-                        <label for="email" class="block text-sm font-medium text-gray-700">Email <span class="text-red-500">*</span></label>
+                        <label for="email" class="block text-sm font-medium text-gray-700">E-mail <span class="text-red-500">*</span></label>
                         <div class="relative mt-1 rounded-md shadow-sm">
                           <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                             <svg class="h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
@@ -187,17 +187,17 @@
                             v-model="inquiryForm.email"
                             required
                             class="focus:ring-purple-500 focus:border-purple-500 block w-full pl-10 sm:text-sm border-gray-300 rounded-md py-3 border"
-                            placeholder="your@email.com"
+                            placeholder="votre@email.com"
                           >
                         </div>
                       </div>
                       
                       <!-- Phone Field (full width on mobile, half on larger screens) -->
                       <div class="space-y-1 sm:col-span-2">
-                        <label for="phone" class="block text-sm font-medium text-gray-700">Phone Number</label>
+                        <label for="phone" class="block text-sm font-medium text-gray-700">Numéro de téléphone</label>
                         <div class="relative mt-1 rounded-md shadow-sm">
                           <div class="absolute inset-y-0 left-0 flex items-center">
-                            <label for="country" class="sr-only">Country</label>
+                            <label for="country" class="sr-only">Pays</label>
                             <select id="country" name="country" class="focus:ring-purple-500 focus:border-purple-500 h-full py-0 pl-3 pr-7 border-transparent bg-transparent text-gray-500 sm:text-sm rounded-l-md">
                               <option>DZ +213</option>
                             </select>
@@ -208,16 +208,16 @@
                             v-model="inquiryForm.phone"
                             class="focus:ring-purple-500 focus:border-purple-500 block w-full pl-24 sm:text-sm border-gray-300 rounded-md py-3 border"
                             :disabled="isSubmitting"
-                            placeholder="6 12 34 56 78"
+                            placeholder="06 12 34 56 78"
                           >
                         </div>
-                        <p class="mt-1 text-xs text-gray-500">Optional, but recommended for faster response</p>
+                        <p class="mt-1 text-xs text-gray-500">Facultatif, mais recommandé pour une réponse plus rapide</p>
                       </div>
                     </div>
                     
                     <!-- Message Field (full width) -->
                     <div class="space-y-1">
-                      <label for="message" class="block text-sm font-medium text-gray-700">Your Message <span class="text-red-500">*</span></label>
+                      <label for="message" class="block text-sm font-medium text-gray-700">Votre message <span class="text-red-500">*</span></label>
                       <div class="mt-1">
                         <textarea 
                           id="message" 
@@ -226,10 +226,10 @@
                           required
                           class="shadow-sm focus:ring-purple-500 focus:border-purple-500 block w-full sm:text-sm border-gray-300 rounded-md py-3 px-4 border"
                           :disabled="isSubmitting"
-                          placeholder="Hello, I'm interested in this property. Could you please provide more details about..."
+                          placeholder="Bonjour, je suis intéressé par ce bien. Pourriez-vous me fournir plus d'informations concernant..."
                         ></textarea>
                       </div>
-                      <p class="mt-1 text-xs text-gray-500">Please include any specific questions or requirements</p>
+                      <p class="mt-1 text-xs text-gray-500">Veuillez inclure toutes questions ou exigences particulières</p>
                     </div>
                     <!-- Form Actions -->
                     <div class="space-y-3 pt-2">
@@ -242,14 +242,14 @@
                           <svg class="w-5 h-5 mr-2 -ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
                           </svg>
-                          Send Message
+                          Envoyer le message
                         </span>
                         <span v-else class="flex items-center">
                           <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                             <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                             <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                           </svg>
-                          Sending your message...
+                          Envoi en cours...
                         </span>
                       </button>
                       
@@ -270,8 +270,8 @@
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                           </svg>
                           <div>
-                            <p class="text-sm font-medium text-green-800">Message sent successfully!</p>
-                            <p class="text-xs text-green-600 mt-1">We've received your inquiry and will get back to you shortly.</p>
+                            <p class="text-sm font-medium text-green-800">Message envoyé avec succès !</p>
+                            <p class="text-xs text-green-600 mt-1">Nous avons bien reçu votre demande et vous répondrons dans les plus brefs délais.</p>
                           </div>
                         </div>
                       </div>
@@ -280,7 +280,7 @@
                   
                   <!-- Contact Information -->
                   <div v-if="property?.user" class="mt-6 pt-4 border-t border-gray-100">
-                    <h4 class="text-sm font-medium text-gray-900 mb-2">Contact Information</h4>
+                    <h4 class="text-sm font-medium text-gray-900 mb-2">Coordonnées</h4>
                     <p class="text-sm font-medium text-gray-900">{{ property.user.name }}</p>
                     <p class="text-sm text-purple-600 mt-1">
                       <a :href="'mailto:' + property.user.email" class="hover:underline">{{ property.user.email }}</a>
@@ -291,27 +291,6 @@
                   </div>
                 </div>
               
-              </div>
-            </div>
-          </div>
-        </div>
-        
-        <!-- Similar Properties -->
-        <div class="bg-gray-50 py-12">
-          <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <h2 class="text-2xl font-bold text-gray-900 mb-8">Similar Properties</h2>
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-              <!-- Similar property cards would go here -->
-              <div v-for="i in 3" :key="i" class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300">
-                <div class="h-48 bg-gray-200 animate-pulse"></div>
-                <div class="p-4">
-                  <div class="h-6 bg-gray-200 rounded w-3/4 mb-2 animate-pulse"></div>
-                  <div class="h-4 bg-gray-200 rounded w-1/2 mb-4 animate-pulse"></div>
-                  <div class="flex justify-between items-center">
-                    <div class="h-6 bg-gray-200 rounded w-1/3 animate-pulse"></div>
-                    <div class="h-10 w-10 rounded-full bg-gray-200 animate-pulse"></div>
-                  </div>
-                </div>
               </div>
             </div>
           </div>
@@ -386,14 +365,14 @@
       
       // Check if response exists and has data
       if (!response) {
-        throw new Error('No response received from server');
+        throw new Error('Aucune réponse reçue du serveur');
       }
       
       // Handle case where response might be the data directly
       const responseData = response.data || response;
       
       if (!responseData) {
-        throw new Error('No data in response');
+        throw new Error('Aucune donnée dans la réponse');
       }
       
       console.log('📦 Response Data:', responseData);
@@ -461,10 +440,33 @@
     }
   };
   
+  // Format location object/string into readable text
+  const formatLocation = (location) => {
+    if (!location) return '';
+    
+    try {
+      // If it's already a string, try to parse it as JSON
+      const locationObj = typeof location === 'string' ? JSON.parse(location) : location;
+      
+      // Extract address components
+      const parts = [
+        locationObj.street,
+        locationObj.baladia,
+        locationObj.daira,
+        locationObj.wilaya
+      ].filter(Boolean); // Remove any empty/undefined parts
+      
+      return parts.join(', ');
+    } catch (e) {
+      // If parsing fails or it's not an object, return as is
+      return typeof location === 'string' ? location : '';
+    }
+  };
+
   // Format price in DZD with proper formatting
   const formattedPrice = computed(() => {
     if (!property.value?.price) return 'N/A';
-    const numericValue = Number(String(property.value.price).replace(/[^0-9.-]+/g, ""));
+    const numericValue = Number(String(property.value.price).replace(/[^0-9,.-]+/g, "").replace(',', '.'));
     return `${numericValue.toLocaleString('ar-DZ')} DZD`;
   });
   

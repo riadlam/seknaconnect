@@ -35,13 +35,20 @@
               <input
                 type="text"
                 v-model="searchQuery"
-                @focus="isSearchFocused = true"
-                @blur="isSearchFocused = false"
+                @focus="onSearchFocus"
+                @blur="onSearchBlur"
+                @input="onSearchInput"
                 class="block w-full pl-10 pr-3 py-2 border-0 bg-transparent text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-0 sm:text-sm rounded-full"
-                placeholder="Search properties..."
+                placeholder="Rechercher des biens..."
               />
-              <div v-if="searchQuery" class="absolute inset-y-0 right-0 flex items-center pr-3">
-                <button @click="clearSearch" class="text-gray-400 hover:text-gray-500">
+              <div v-if="isLoading" class="absolute inset-y-0 right-0 flex items-center pr-3">
+                <svg class="animate-spin h-4 w-4 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                  <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+              </div>
+              <div v-else-if="searchQuery" class="absolute inset-y-0 right-0 flex items-center pr-3">
+                <button @click.prevent="clearSearch" class="text-gray-400 hover:text-gray-500">
                   <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                   </svg>
@@ -52,27 +59,49 @@
             <!-- Search Results Dropdown -->
             <div v-if="searchQuery && isSearchFocused" class="absolute z-10 mt-1 w-full rounded-md bg-white shadow-lg max-h-96 overflow-auto">
               <div class="p-4 border-b border-gray-100">
-                <p class="text-sm text-gray-500">Search results for "{{ searchQuery }}"</p>
+                <p class="text-sm text-gray-500">Résultats pour "{{ searchQuery }}"</p>
               </div>
-              <div class="py-1">
-                <div v-for="i in 3" :key="i" class="px-4 py-3 hover:bg-gray-50 cursor-pointer transition-colors">
-                  <div class="flex items-center">
-                    <div class="flex-shrink-0 h-10 w-10 bg-purple-100 rounded-full flex items-center justify-center">
-                      <svg class="h-5 w-5 text-purple-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
-                      </svg>
+              <div v-if="isLoading" class="p-4 flex justify-center">
+                <svg class="animate-spin h-5 w-5 text-purple-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                  <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+              </div>
+              <div v-else-if="searchResults.length > 0" class="py-1">
+                <router-link 
+                  v-for="result in searchResults" 
+                  :key="result.id" 
+                  :to="`/properties/${result.id}`"
+                  class="block px-4 py-3 hover:bg-gray-50 cursor-pointer transition-colors border-b border-gray-100 last:border-b-0"
+                >
+                  <div class="flex items-start">
+                    <div class="flex-shrink-0 h-16 w-16 rounded-md overflow-hidden bg-gray-100">
+                      <img 
+                        v-if="result.images && result.images.length > 0"
+                        :src="result.images[0].image_path" 
+                        :alt="result.name"
+                        class="h-full w-full object-cover"
+                      />
+                      <div v-else class="h-full w-full bg-gray-200 flex items-center justify-center">
+                        <svg class="h-6 w-6 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                        </svg>
+                      </div>
                     </div>
-                    <div class="ml-4">
-                      <p class="text-sm font-medium text-gray-900">Property {{ i }} in {{ ['New York', 'Los Angeles', 'Miami'][i % 3] }}</p>
-                      <p class="text-sm text-gray-500">{{ ['Apartment', 'Villa', 'Penthouse'][i % 3] }} · ${{ (1000 + i * 500).toLocaleString() }}</p>
+                    <div class="ml-3 flex-1 min-w-0">
+                      <p class="text-sm font-medium text-gray-900 truncate">{{ result.name }}</p>
+                      <p class="text-sm text-gray-500">
+                        {{ result.housing_type }} · {{ formatPrice(result.price) }}
+                      </p>
+                      <p class="text-xs text-gray-400 mt-1 truncate">
+                        {{ getLocation(result.location) }}
+                      </p>
                     </div>
                   </div>
-                </div>
+                </router-link>
               </div>
-              <div class="p-3 bg-gray-50 text-center border-t border-gray-100">
-                <button class="text-sm font-medium text-purple-600 hover:text-purple-700">
-                  View all results
-                </button>
+              <div v-else-if="!isLoading" class="p-4 text-center text-sm text-gray-500">
+                Aucun résultat trouvé
               </div>
             </div>
           </div>
@@ -99,7 +128,7 @@
                 to="/auth" 
                 class="px-4 py-2 text-sm font-medium text-gray-700 hover:text-purple-600 transition-all duration-300 relative group"
               >
-                <span class="relative z-10">Sign In</span>
+                <span class="relative z-10">Connexion</span>
                 <span class="absolute inset-0 bg-gradient-to-r from-purple-50 to-transparent opacity-0 group-hover:opacity-100 rounded-md transition-opacity duration-300"></span>
               </router-link>
               <router-link 
@@ -108,7 +137,7 @@
               >
                 <span class="absolute inset-0 bg-gradient-to-r from-white/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></span>
                 <span class="relative z-10 flex items-center">
-                  Get Started
+                  Commencer
                   <svg class="ml-1.5 w-4 h-4 transform group-hover:translate-x-1 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
                   </svg>
@@ -122,7 +151,7 @@
                   @click="toggleUserMenu" 
                   type="button" 
                   class="flex items-center justify-center h-8 w-8 rounded-full bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-medium focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500"
-                  aria-label="User menu"
+                  aria-label="Menu utilisateur"
                 >
                   {{ userInitial }}
                 </button>
@@ -151,7 +180,7 @@
                         <svg class="h-5 w-5 mr-2 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
                         </svg>
-                        Dashboard
+                        Tableau de bord
                       </router-link>
                       <div class="border-t border-gray-100 my-1"></div>
                       <button
@@ -162,7 +191,7 @@
                         <svg class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
                         </svg>
-                        Sign out
+                        Se déconnecter
                       </button>
                     </div>
                   </div>
@@ -179,7 +208,7 @@
             class="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-purple-500"
             aria-expanded="false"
           >
-            <span class="sr-only">Open main menu</span>
+            <span class="sr-only">Ouvrir le menu principal</span>
             <svg 
               class="h-6 w-6" 
               :class="{'hidden': isOpen, 'block': !isOpen}" 
@@ -206,51 +235,13 @@
         </div>
       </div>
     </div>
-
-    <!-- Mobile menu -->
-    <div 
-      class="md:hidden transition-all duration-300 ease-in-out overflow-hidden" 
-      :class="{'max-h-0': !isOpen, 'max-h-96': isOpen}"
-    >
-      <div class="pt-2 pb-3 space-y-1">
-        <router-link
-          v-for="item in navItems"
-          :key="`mobile-${item.name}`"
-          :to="item.href"
-          @click="isOpen = false"
-          class="block pl-3 pr-4 py-2 border-l-4 text-base font-medium transition-colors duration-200"
-          :class="[isActive(item.href) 
-            ? 'bg-purple-50 border-purple-500 text-purple-700' 
-            : 'border-transparent text-gray-600 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-800']"
-        >
-          {{ item.name }}
-        </router-link>
-        <div class="pt-4 pb-3 border-t border-gray-200">
-          <div class="mt-3 space-y-1">
-            <router-link
-              to="/auth"
-              @click="isOpen = false"
-              class="block px-4 py-2 text-base font-medium text-gray-500 hover:text-gray-800 hover:bg-gray-100"
-            >
-              Sign in
-            </router-link>
-            <router-link
-              to="/auth"
-              @click="isOpen = false"
-              class="block px-4 py-2 text-base font-medium text-gray-500 hover:text-gray-800 hover:bg-gray-100"
-            >
-              Create account
-            </router-link>
-          </div>
-        </div>
-      </div>
-    </div>
   </nav>
 </template>
 
 <script>
 import { ref, onMounted, onUnmounted, nextTick, computed, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
+import axios from 'axios';
 import { useStore } from 'vuex';
 
 export default {
@@ -268,7 +259,81 @@ export default {
     const showMobileSearch = ref(false);
     const showUserMenu = ref(false);
     const isInitialized = ref(false);
-    
+    const searchResults = ref([]);
+    const isLoading = ref(false);
+    const searchTimeout = ref(null);
+
+    // Search functionality
+    const formatPrice = (price) => {
+      if (!price) return '';
+      return new Intl.NumberFormat('fr-DZ', {
+        style: 'currency',
+        currency: 'DZD',
+        maximumFractionDigits: 0
+      }).format(price);
+    };
+
+    const getLocation = (location) => {
+      if (!location) return '';
+      try {
+        const loc = JSON.parse(location);
+        return [loc.wilaya, loc.commune, loc.daira].filter(Boolean).join(', ');
+      } catch (e) {
+        return location;
+      }
+    };
+
+    const searchProjects = async (query) => {
+      if (!query.trim()) {
+        searchResults.value = [];
+        return;
+      }
+
+      isLoading.value = true;
+      try {
+        const response = await axios.get(`/api/projects/search?q=${encodeURIComponent(query)}`);
+        searchResults.value = response.data;
+      } catch (error) {
+        console.error('Search error:', error);
+        searchResults.value = [];
+      } finally {
+        isLoading.value = false;
+      }
+    };
+
+    const onSearchInput = () => {
+      clearTimeout(searchTimeout.value);
+      searchTimeout.value = setTimeout(() => {
+        searchProjects(searchQuery.value);
+      }, 300); // 300ms debounce
+    };
+
+    const onSearchFocus = () => {
+      isSearchFocused.value = true;
+      if (searchQuery.value) {
+        searchProjects(searchQuery.value);
+      }
+    };
+
+    const onSearchBlur = () => {
+      // Small delay to allow click on results before hiding
+      setTimeout(() => {
+        isSearchFocused.value = false;
+      }, 200);
+    };
+
+    const clearSearch = () => {
+      searchQuery.value = '';
+      searchResults.value = [];
+    };
+
+    // Clean up timeouts on component unmount
+    onUnmounted(() => {
+      if (searchTimeout.value) {
+        clearTimeout(searchTimeout.value);
+      }
+    });
+
     // Check for existing auth data in storage
     const checkAuthStatus = async () => {
       try {
@@ -347,7 +412,7 @@ export default {
       } catch (e) {
         console.error('Error getting user role:', e);
       }
-      return '';
+      return 'Visiteur';
     });
     
     // Toggle user menu
@@ -357,7 +422,7 @@ export default {
     
     // Close user menu when clicking outside
     const handleClickOutside = (event) => {
-      const profileButton = event.target.closest('button[aria-label="User menu"]');
+      const profileButton = event.target.closest('button[aria-label="Menu utilisateur"]');
       const dropdownMenu = event.target.closest('.profile-dropdown');
       
       if (!profileButton && !dropdownMenu) {
@@ -394,9 +459,9 @@ export default {
     });
 
     const navItems = [
-      { name: 'Home', href: '/' },
-      { name: 'Properties', href: '/properties' },
-      { name: 'About', href: '/about' },
+      { name: 'Accueil', href: '/' },
+      { name: 'Biens', href: '/properties' },
+      { name: 'À propos', href: '/about' },
       { name: 'Contact', href: '/contact' }
     ];
 
@@ -406,10 +471,6 @@ export default {
 
     const closeMenu = () => {
       isOpen.value = false;
-    };
-
-    const clearSearch = () => {
-      searchQuery.value = '';
     };
 
     const toggleSearch = () => {
@@ -468,7 +529,14 @@ export default {
       userRole,
       showUserMenu,
       toggleUserMenu,
-      handleLogout
+      handleLogout,
+      searchResults,
+      isLoading,
+      onSearchInput,
+      onSearchFocus,
+      onSearchBlur,
+      formatPrice,
+      getLocation
     };
   }
 }

@@ -5,10 +5,10 @@
       <div class="absolute inset-0 bg-black/30"></div>
       <div class="container mx-auto px-4 relative z-10">
         <div class="max-w-3xl mx-auto text-center">
-          <h1 class="text-4xl md:text-5xl font-bold mb-4">Get In Touch</h1>
+          <h1 class="text-4xl md:text-5xl font-bold mb-4">Contactez-nous</h1>
           <p class="text-xl text-purple-100 max-w-2xl mx-auto">
-            Have questions about our properties or services? We'd love to hear from you. 
-            Reach out to our team for personalized assistance.
+            Vous avez des questions sur nos biens ou services ? Nous serions ravis d'avoir de vos nouvelles.
+            Contactez notre équipe pour une assistance personnalisée.
           </p>
         </div>
       </div>
@@ -20,47 +20,47 @@
         <div class="grid md:grid-cols-2 gap-0">
           <!-- Contact Form -->
           <div class="p-8 md:p-12">
-            <h2 class="text-2xl font-bold text-gray-900 mb-6">Send us a message</h2>
+            <h2 class="text-2xl font-bold text-gray-900 mb-6">Envoyez-nous un message</h2>
             <form @submit.prevent="submitForm" class="space-y-6">
               <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                  <label for="first-name" class="block text-sm font-medium text-gray-700 mb-1">First Name</label>
+                  <label for="first-name" class="block text-sm font-medium text-gray-700 mb-1">Prénom</label>
                   <input type="text" id="first-name" v-model="form.firstName" required
                     class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-purple-500 focus:border-transparent transition">
                 </div>
                 <div>
-                  <label for="last-name" class="block text-sm font-medium text-gray-700 mb-1">Last Name</label>
+                  <label for="last-name" class="block text-sm font-medium text-gray-700 mb-1">Nom</label>
                   <input type="text" id="last-name" v-model="form.lastName" required
                     class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-purple-500 focus:border-transparent transition">
                 </div>
               </div>
               
               <div>
-                <label for="email" class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                <label for="email" class="block text-sm font-medium text-gray-700 mb-1">E-mail</label>
                 <input type="email" id="email" v-model="form.email" required
                   class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-purple-500 focus:border-transparent transition">
               </div>
               
               <div>
-                <label for="phone" class="block text-sm font-medium text-gray-700 mb-1">Phone (Optional)</label>
+                <label for="phone" class="block text-sm font-medium text-gray-700 mb-1">Téléphone (optionnel)</label>
                 <input type="tel" id="phone" v-model="form.phone"
                   class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-purple-500 focus:border-transparent transition">
               </div>
               
               <div>
-                <label for="subject" class="block text-sm font-medium text-gray-700 mb-1">Subject</label>
+                <label for="subject" class="block text-sm font-medium text-gray-700 mb-1">Sujet</label>
                 <select id="subject" v-model="form.subject" required
                   class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-purple-500 focus:border-transparent transition bg-white">
-                  <option value="">Select a subject</option>
-                  <option value="general">General Inquiry</option>
-                  <option value="property">Property Information</option>
-                  <option value="schedule">Schedule a Viewing</option>
-                  <option value="other">Other</option>
+                  <option value="">Sélectionnez un sujet</option>
+                  <option value="general">Demande générale</option>
+                  <option value="property">Information sur un bien</option>
+                  <option value="schedule">Planifier une visite</option>
+                  <option value="other">Autre</option>
                 </select>
               </div>
               
               <div>
-                <label for="message" class="block text-sm font-medium text-gray-700 mb-1">Your Message</label>
+                <label for="message" class="block text-sm font-medium text-gray-700 mb-1">Votre message</label>
                 <textarea id="message" v-model="form.message" rows="4" required
                   class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-purple-500 focus:border-transparent transition"></textarea>
               </div>
@@ -69,23 +69,23 @@
                 <input type="checkbox" id="subscribe" v-model="form.subscribe"
                   class="h-4 w-4 text-purple-600 focus:ring-purple-500 border-gray-300 rounded">
                 <label for="subscribe" class="ml-2 block text-sm text-gray-700">
-                  Subscribe to our newsletter
+                  S'inscrire à notre newsletter
                 </label>
               </div>
               
               <button type="submit"
                 class="w-full bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-medium py-3 px-6 rounded-lg hover:from-purple-700 hover:to-indigo-700 transition-all duration-300 transform hover:-translate-y-0.5 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500">
-                Send Message
+                Envoyer le message
               </button>
             </form>
           </div>
           
           <!-- Contact Info -->
           <div class="bg-gradient-to-br from-purple-50 to-indigo-50 p-8 md:p-12">
-            <h2 class="text-2xl font-bold text-gray-900 mb-6">Contact Information</h2>
+            <h2 class="text-2xl font-bold text-gray-900 mb-6">Coordonnées</h2>
             <p class="text-gray-600 mb-8">
-              Our team is here to help answer any questions you may have about our properties or services.
-              Reach out to us and we'll respond as soon as possible.
+              Notre équipe est là pour répondre à toutes vos questions concernant nos biens ou services.
+              Contactez-nous et nous vous répondrons dans les plus brefs délais.
             </p>
             
             <div class="space-y-6">
@@ -97,8 +97,8 @@
                   </svg>
                 </div>
                 <div class="ml-4">
-                  <h3 class="text-sm font-medium text-gray-900">Visit Us</h3>
-                  <p class="mt-1 text-gray-600">123 Real Estate Ave, Suite 100<br>New York, NY 10001</p>
+                  <h3 class="text-sm font-medium text-gray-900">Nous rendre visite</h3>
+                  <p class="mt-1 text-gray-600">123 Avenue Immobilière, Bureau 100<br>75001 Paris, France</p>
                 </div>
               </div>
               
@@ -109,8 +109,8 @@
                   </svg>
                 </div>
                 <div class="ml-4">
-                  <h3 class="text-sm font-medium text-gray-900">Email Us</h3>
-                  <p class="mt-1 text-gray-600">info@seknaconnect.com<br>support@seknaconnect.com</p>
+                  <h3 class="text-sm font-medium text-gray-900">Écrivez-nous</h3>
+                  <p class="mt-1 text-gray-600">contact@seknaconnect.com<br>support@seknaconnect.com</p>
                 </div>
               </div>
               
@@ -121,14 +121,14 @@
                   </svg>
                 </div>
                 <div class="ml-4">
-                  <h3 class="text-sm font-medium text-gray-900">Call Us</h3>
-                  <p class="mt-1 text-gray-600">+1 (555) 123-4567<br>Mon - Fri, 9:00 AM - 6:00 PM</p>
+                  <h3 class="text-sm font-medium text-gray-900">Appelez-nous</h3>
+                  <p class="mt-1 text-gray-600">+33 1 23 45 67 89<br>Lun - Ven, 9h00 - 18h00</p>
                 </div>
               </div>
             </div>
             
             <div class="mt-8 pt-8 border-t border-purple-100">
-              <h3 class="text-lg font-medium text-gray-900 mb-4">Follow Us</h3>
+              <h3 class="text-lg font-medium text-gray-900 mb-4">Suivez-nous</h3>
               <div class="flex space-x-4">
                 <a href="#" class="text-purple-600 hover:text-purple-800">
                   <span class="sr-only">Facebook</span>
@@ -165,9 +165,9 @@
     <div class="bg-white py-16">
       <div class="container mx-auto px-4">
         <div class="text-center mb-12">
-          <h2 class="text-3xl font-bold text-gray-900 mb-4">Find Our Office</h2>
+          <h2 class="text-3xl font-bold text-gray-900 mb-4">Trouvez notre agence</h2>
           <p class="text-lg text-gray-600 max-w-2xl mx-auto">
-            Visit our office for a personal consultation about your real estate needs.
+            Visitez notre agence pour une consultation personnalisée concernant vos besoins immobiliers.
           </p>
         </div>
         <div class="rounded-2xl overflow-hidden shadow-xl">
@@ -190,22 +190,22 @@
     <!-- CTA Section -->
     <div class="bg-gradient-to-r from-purple-600 to-indigo-700 text-white py-16">
       <div class="container mx-auto px-4 text-center">
-        <h2 class="text-3xl font-bold mb-4">Ready to find your dream property?</h2>
+        <h2 class="text-3xl font-bold mb-4">Prêt à trouver le bien de vos rêves ?</h2>
         <p class="text-xl text-purple-100 mb-8 max-w-2xl mx-auto">
-          Let our expert team help you find the perfect home that matches your lifestyle and budget.
+          Laissez notre équipe d'experts vous aider à trouver la maison parfaite qui correspond à votre style de vie et à votre budget.
         </p>
         <div class="flex flex-col sm:flex-row justify-center gap-4">
           <router-link 
             to="/properties" 
             class="bg-white text-purple-700 hover:bg-purple-50 font-medium py-3 px-8 rounded-lg transition-all duration-300 transform hover:-translate-y-0.5 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-white"
           >
-            Browse Properties
+            Voir nos biens
           </router-link>
           <a 
             href="tel:+15551234567" 
             class="bg-transparent border-2 border-white text-white hover:bg-white/10 font-medium py-3 px-8 rounded-lg transition-all duration-300 transform hover:-translate-y-0.5 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-white"
           >
-            Call Now
+            Appeler maintenant
           </a>
         </div>
       </div>
@@ -236,7 +236,7 @@ export default {
       // Add your form submission logic here (e.g., API call)
       
       // Show success message
-      this.$toast.success('Your message has been sent successfully!', {
+      this.$toast.success('Votre message a bien été envoyé !', {
         position: 'top-center',
         duration: 5000
       });

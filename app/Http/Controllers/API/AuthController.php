@@ -17,8 +17,12 @@ class AuthController extends Controller
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users',
             'password' => 'required|min:6',
-            'role' => 'required|in:professional,public'
+            'role' => 'in:professional,public' // optional, default to professional
         ]);
+
+        if (!isset($validated['role']) || empty($validated['role'])) {
+            $validated['role'] = 'professional';
+        }
 
         $user = User::create([
             'name' => $validated['name'],
@@ -115,8 +119,13 @@ class AuthController extends Controller
             $query->where('role', $request->role);
         }
 
+        // Filter by verification status if provided
+        if ($request->has('is_verified')) {
+            $query->where('is_verified', $request->is_verified);
+        }
+
         // Get all matching users
-        $users = $query->select(['id', 'name', 'email', 'role', 'phone', 'email_verified_at', 'created_at', 'updated_at'])
+        $users = $query->select(['id', 'name', 'email', 'role', 'phone', 'is_verified', 'email_verified_at', 'created_at', 'updated_at'])
                      ->orderBy('created_at', 'desc')
                      ->get();
 
@@ -156,6 +165,62 @@ class AuthController extends Controller
      *     )
      * )
      */
+    /**
+     * Verify a user
+     *
+     * @OA\Post(
+     *     path="/api/admin/users/{id}/verify",
+     *     summary="Verify a user account",
+     *     tags={"Admin"},
+     *     security={{"bearerAuth":{}}},
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         required=true,
+     *         description="User ID",
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\Response(
+     *         response=200,
+     *         description="User verified successfully",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="message", type="string", example="User verified successfully"),
+     *             @OA\Property(property="user", ref="#/components/schemas/User")
+     *         )
+     *     ),
+     *     @OA\Response(
+     *         response=403,
+     *         description="Unauthorized"
+     *     ),
+     *     @OA\Response(
+     *         response=404,
+     *         description="User not found"
+     *     )
+     * )
+     */
+    public function verifyUser(Request $request, $id)
+    {
+        // Check if user is admin
+        if ($request->user()->role !== 'admin') {
+            return response()->json(['error' => 'Unauthorized. Admin access required.'], 403);
+        }
+
+        // Find the user to verify
+        $user = User::where('id', $id)
+                   ->where('role', '!=', 'admin') // Don't modify admin users
+                   ->firstOrFail();
+
+        // Update the user's verification status
+        $user->is_verified = true;
+        $user->save();
+
+        return response()->json([
+            'message' => 'User verified successfully',
+            'user' => $user->only(['id', 'name', 'email', 'role', 'is_verified'])
+        ]);
+    }
+
     public function deleteUser(Request $request, $id)
     {
         // Check if user is admin

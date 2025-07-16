@@ -5,9 +5,9 @@
       <div class="absolute inset-0 bg-black/30"></div>
       <div class="container mx-auto px-4 relative z-10">
         <div class="max-w-4xl mx-auto text-center">
-          <h1 class="text-4xl md:text-5xl font-bold mb-4">Find Your Dream Property</h1>
+          <h1 class="text-4xl md:text-5xl font-bold mb-4">Trouvez le bien de vos rêves</h1>
           <p class="text-xl text-purple-100">
-            Browse our selection of premium properties and find your perfect match
+            Parcouvez notre sélection de biens premium et trouvez la perle rare
           </p>
         </div>
       </div>
@@ -20,23 +20,23 @@
         <div class="w-full md:w-80 flex-shrink-0">
           <div class="bg-white rounded-xl shadow-md p-6 sticky top-4">
             <div class="flex justify-between items-center mb-6">
-              <h2 class="text-lg font-semibold text-gray-900">Filters</h2>
+              <h2 class="text-lg font-semibold text-gray-900">Filtres</h2>
               <button 
                 @click="resetFilters"
                 class="text-sm text-purple-600 hover:text-purple-700"
               >
-                Reset All
+                Réinitialiser
               </button>
             </div>
 
             <!-- Search -->
             <div class="mb-6">
-              <label class="block text-sm font-medium text-gray-700 mb-2">Search</label>
+              <label class="block text-sm font-medium text-gray-700 mb-2">Recherche</label>
               <div class="relative">
                 <input
                   type="text"
                   v-model="filters.search"
-                  placeholder="Search properties..."
+                  placeholder="Rechercher un bien..."
                   class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                 >
                 <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -49,7 +49,7 @@
 
             <!-- Property Type -->
             <div class="mb-6">
-              <h3 class="text-sm font-medium text-gray-700 mb-3">Property Type</h3>
+              <h3 class="text-sm font-medium text-gray-700 mb-3">Type de bien</h3>
               <div class="space-y-2">
                 <div v-for="type in propertyTypes" :key="type.value" class="flex items-center">
                   <input
@@ -68,10 +68,10 @@
 
             <!-- Price Range -->
             <div class="mb-6">
-              <h3 class="text-sm font-medium text-gray-700 mb-3">Price Range (DZD)</h3>
+              <h3 class="text-sm font-medium text-gray-700 mb-3">Fourchette de prix (DZD)</h3>
               <div class="flex items-center gap-3">
                 <div class="flex-1">
-                  <label for="min-price" class="sr-only">Min price</label>
+                  <label for="min-price" class="sr-only">Prix min</label>
                   <div class="relative rounded-md shadow-sm">
                     <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                       <span class="text-gray-500 text-sm">DZD</span>
@@ -88,7 +88,7 @@
                 </div>
                 <div class="text-gray-500 mt-1">-</div>
                 <div class="flex-1">
-                  <label for="max-price" class="sr-only">Max price</label>
+                  <label for="max-price" class="sr-only">Prix max</label>
                   <div class="relative rounded-md shadow-sm">
                     <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                       <span class="text-gray-500 text-sm">DZD</span>
@@ -105,6 +105,182 @@
                 </div>
               </div>
             </div>
+
+            <!-- Surface Area Range -->
+            <div class="mb-6">
+              <h3 class="text-sm font-medium text-gray-700 mb-3">Surface (m²)</h3>
+              <div class="flex items-center gap-3">
+                <div class="flex-1">
+                  <label for="min-area" class="sr-only">Surface min</label>
+                  <div class="relative rounded-md shadow-sm">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                      <span class="text-gray-500 text-sm">m²</span>
+                    </div>
+                    <input
+                      type="number"
+                      id="min-area"
+                      v-model.number="filters.minArea"
+                      placeholder="Min"
+                      class="block w-full pl-16 pr-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 sm:text-sm"
+                      min="0"
+                    >
+                  </div>
+                </div>
+                <div class="text-gray-500 mt-1">-</div>
+                <div class="flex-1">
+                  <label for="max-area" class="sr-only">Surface max</label>
+                  <div class="relative rounded-md shadow-sm">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                      <span class="text-gray-500 text-sm">m²</span>
+                    </div>
+                    <input
+                      type="number"
+                      id="max-area"
+                      v-model.number="filters.maxArea"
+                      placeholder="Max"
+                      class="block w-full pl-16 pr-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 sm:text-sm"
+                      :min="filters.minArea || 0"
+                    >
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Number of Units Range -->
+            <div class="mb-6">
+              <h3 class="text-sm font-medium text-gray-700 mb-3">Nombre d'unités</h3>
+              <div class="flex items-center gap-3">
+                <div class="flex-1">
+                  <label for="min-units" class="sr-only">Unités min</label>
+                  <input
+                    type="number"
+                    id="min-units"
+                    v-model.number="filters.minUnits"
+                    placeholder="Min"
+                    class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 sm:text-sm"
+                    min="0"
+                  >
+                </div>
+                <div class="text-gray-500">-</div>
+                <div class="flex-1">
+                  <label for="max-units" class="sr-only">Unités max</label>
+                  <input
+                    type="number"
+                    id="max-units"
+                    v-model.number="filters.maxUnits"
+                    placeholder="Max"
+                    class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 sm:text-sm"
+                    :min="filters.minUnits || 0"
+                  >
+                </div>
+              </div>
+            </div>
+
+            <!-- Delivery Date Range -->
+            <div class="mb-6">
+              <h3 class="text-sm font-medium text-gray-700 mb-3">Date de livraison</h3>
+              <div class="space-y-3">
+                <div>
+                  <label for="delivery-start" class="block text-xs font-medium text-gray-500 mb-1">Date de début</label>
+                  <input
+                    type="date"
+                    id="delivery-start"
+                    v-model="filters.deliveryStartDate"
+                    class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 sm:text-sm"
+                    :max="filters.deliveryEndDate || ''"
+                  >
+                </div>
+                <div>
+                  <label for="delivery-end" class="block text-xs font-medium text-gray-500 mb-1">Date de fin</label>
+                  <input
+                    type="date"
+                    id="delivery-end"
+                    v-model="filters.deliveryEndDate"
+                    class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 sm:text-sm"
+                    :min="filters.deliveryStartDate || ''"
+                  >
+                </div>
+              </div>
+            </div>
+
+            <!-- Location Filters -->
+            <div class="mb-6">
+              <h3 class="text-sm font-medium text-gray-700 mb-3">Localisation</h3>
+              
+              <!-- Wilaya -->
+              <div class="mb-3">
+                <label for="wilaya" class="block text-xs font-medium text-gray-500 mb-1">Wilaya</label>
+                <div class="relative">
+                  <select
+                    id="wilaya"
+                    v-model="filters.wilaya"
+                    class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 sm:text-sm"
+                    :disabled="isLoadingLocations"
+                    @change="onWilayaChange"
+                  >
+                    <option value="">Sélectionner une wilaya</option>
+                    <option v-for="wilaya in wilayas" :key="'w-'+wilaya" :value="wilaya">
+                      {{ wilaya }}
+                    </option>
+                  </select>
+                  <div v-if="isLoadingLocations" class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                    <svg class="animate-spin h-4 w-4 text-purple-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                      <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                      <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                  </div>
+                </div>
+              </div>
+              
+              <!-- Baladia -->
+              <div class="mb-3">
+                <label for="baladia" class="block text-xs font-medium text-gray-500 mb-1">Commune</label>
+                <div class="relative">
+                  <select
+                    id="baladia"
+                    v-model="filters.baladia"
+                    :disabled="!filters.wilaya || isLoadingBaladias"
+                    class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 sm:text-sm"
+                    @change="onBaladiaChange"
+                  >
+                    <option value="">Sélectionner une commune</option>
+                    <option v-for="baladia in baladias" :key="'b-'+baladia" :value="baladia">
+                      {{ baladia }}
+                    </option>
+                  </select>
+                  <div v-if="isLoadingBaladias" class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                    <svg class="animate-spin h-4 w-4 text-purple-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                      <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                      <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                  </div>
+                </div>
+              </div>
+              
+              <!-- Daira -->
+              <div>
+                <label for="daira" class="block text-xs font-medium text-gray-500 mb-1">Daira</label>
+                <div class="relative">
+                  <select
+                    id="daira"
+                    v-model="filters.daira"
+                    :disabled="!filters.baladia || isLoadingDairas"
+                    class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 sm:text-sm"
+                  >
+                    <option value="">Sélectionner une daira</option>
+                    <option v-for="daira in dairas" :key="'d-'+daira" :value="daira">
+                      {{ daira }}
+                    </option>
+                  </select>
+                  <div v-if="isLoadingDairas" class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                    <svg class="animate-spin h-4 w-4 text-purple-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                      <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                      <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -113,21 +289,21 @@
           <!-- Sort and View Options -->
           <div class="flex flex-wrap items-center justify-between gap-2 mb-6 w-full">
             <p class="text-sm text-gray-600">
-              <span class="hidden xs:inline">Showing</span> <span class="font-medium">{{ filteredProperties.length }}</span> <span class="hidden sm:inline">properties</span>
+              <span class="hidden xs:inline">Affichage de</span> <span class="font-medium">{{ filteredProperties.length }}</span> <span class="hidden sm:inline">biens</span>
             </p>
             <div class="flex items-center gap-2">
               <label for="sort" class="text-sm text-gray-700 whitespace-nowrap">
-                Sort:
+                Trier par :
               </label>
               <select
                 id="sort"
                 v-model="sortOption"
                 class="text-sm border-gray-300 rounded-md focus:ring-purple-500 focus:border-purple-500 py-1.5"
               >
-                <option value="featured">Featured</option>
-                <option value="price-asc">Price: Low to High</option>
-                <option value="price-desc">Price: High to Low</option>
-                <option value="newest">Newest</option>
+                <option value="featured">À la une</option>
+                <option value="price-asc">Prix croissant</option>
+                <option value="price-desc">Prix décroissant</option>
+                <option value="newest">Plus récent</option>
               </select>
             </div>
           </div>
@@ -176,7 +352,7 @@
                   </svg>
                 </div>
                 <div class="absolute top-2 right-2 bg-white/90 backdrop-blur-sm rounded-full px-2 py-1 text-xs font-medium text-gray-800">
-                  {{ property.housing_type || 'Property' }}
+                  {{ property.housing_type || 'Bien' }}
                 </div>
               </div>
               
@@ -188,11 +364,11 @@
                 </div>
                 
                 <p class="mt-1 text-sm text-gray-500 flex items-center">
-                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                   </svg>
-                  {{ property.location || 'Location not specified' }}
+                  <span class="line-clamp-1">{{ formatLocation(property.location) || 'Localisation non spécifiée' }}</span>
                 </p>
                 
                 <div class="mt-3 pt-3 border-t border-gray-100 flex items-center justify-between">
@@ -207,7 +383,7 @@
                       <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
                       </svg>
-                      {{ property.num_units || 'N/A' }} units
+                      {{ property.num_units || 'N/A' }} unités
                     </span>
                   </div>
                 </div>
@@ -220,156 +396,19 @@
             <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
-            <h3 class="mt-2 text-sm font-medium text-gray-900">No properties found</h3>
-            <p class="mt-1 text-sm text-gray-500">Try adjusting your search or filter to find what you're looking for.</p>
+            <h3 class="mt-2 text-sm font-medium text-gray-900">Aucun bien trouvé</h3>
+            <p class="mt-1 text-sm text-gray-500">Ajustez vos critères de recherche pour trouver ce que vous cherchez.</p>
             <div class="mt-6">
               <button
                 @click="resetFilters"
                 class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500"
               >
-                Reset filters
+                Réinitialiser les filtres
               </button>
             </div>
           </div>
 
-          <!-- Pagination -->
-          <div v-if="!isLoading && !error && properties.length > 0" class="mt-12 flex justify-center">
-            <nav class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
-              <!-- Previous Button -->
-              <button
-                @click="currentPage--"
-                :disabled="currentPage === 1"
-                :class="{ 'opacity-50 cursor-not-allowed': currentPage === 1 }"
-                class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50"
-              >
-                <span class="sr-only">Previous</span>
-                <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                  <path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd" />
-                </svg>
-              </button>
-              
-              <!-- Page Numbers -->
-              <template v-if="totalPages <= 7">
-                <button
-                  v-for="page in totalPages"
-                  :key="page"
-                  @click="currentPage = page"
-                  :class="{
-                    'z-10 bg-purple-50 border-purple-500 text-purple-600': currentPage === page,
-                    'bg-white border-gray-300 text-gray-500 hover:bg-gray-50': currentPage !== page
-                  }"
-                  class="relative inline-flex items-center px-4 py-2 border text-sm font-medium"
-                  :aria-current="currentPage === page ? 'page' : undefined"
-                >
-                  {{ page }}
-                </button>
-              </template>
-              
-              <template v-else>
-                <!-- First page -->
-                <button
-                  @click="currentPage = 1"
-                  :class="{
-                    'z-10 bg-purple-50 border-purple-500 text-purple-600': currentPage === 1,
-                    'bg-white border-gray-300 text-gray-500 hover:bg-gray-50': currentPage !== 1
-                  }"
-                  class="relative inline-flex items-center px-4 py-2 border text-sm font-medium"
-                >
-                  1
-                </button>
-                
-                <!-- Ellipsis before current page -->
-                <span v-if="currentPage > 3" class="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700">
-                  ...
-                </span>
-                
-                <!-- Current page and siblings -->
-                <template v-if="currentPage <= 3">
-                  <button
-                    v-for="page in 3"
-                    v-if="page !== 1"
-                    :key="page"
-                    @click="currentPage = page"
-                    :class="{
-                      'z-10 bg-purple-50 border-purple-500 text-purple-600': currentPage === page,
-                      'bg-white border-gray-300 text-gray-500 hover:bg-gray-50': currentPage !== page
-                    }"
-                    class="relative inline-flex items-center px-4 py-2 border text-sm font-medium"
-                  >
-                    {{ page }}
-                  </button>
-                </template>
-                
-                <template v-else-if="currentPage >= totalPages - 2">
-                  <button
-                    v-for="page in 3"
-                    v-if="totalPages - 4 + page !== totalPages"
-                    :key="totalPages - 4 + page"
-                    @click="currentPage = totalPages - 4 + page"
-                    :class="{
-                      'z-10 bg-purple-50 border-purple-500 text-purple-600': currentPage === totalPages - 4 + page,
-                      'bg-white border-gray-300 text-gray-500 hover:bg-gray-50': currentPage !== totalPages - 4 + page
-                    }"
-                    class="relative inline-flex items-center px-4 py-2 border text-sm font-medium"
-                  >
-                    {{ totalPages - 4 + page }}
-                  </button>
-                </template>
-                
-                <template v-else>
-                  <button
-                    v-for="page in [-1, 0, 1]"
-                    :key="currentPage + page"
-                    @click="currentPage = currentPage + page"
-                    :class="{
-                      'z-10 bg-purple-50 border-purple-500 text-purple-600': page === 0,
-                      'bg-white border-gray-300 text-gray-500 hover:bg-gray-50': page !== 0
-                    }"
-                    class="relative inline-flex items-center px-4 py-2 border text-sm font-medium"
-                  >
-                    {{ currentPage + page }}
-                  </button>
-                </template>
-                
-                <!-- Ellipsis after current page -->
-                <span v-if="currentPage < totalPages - 2" class="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700">
-                  ...
-                </span>
-                
-                <!-- Last page -->
-                <button
-                  @click="currentPage = totalPages"
-                  :class="{
-                    'z-10 bg-purple-50 border-purple-500 text-purple-600': currentPage === totalPages,
-                    'bg-white border-gray-300 text-gray-500 hover:bg-gray-50': currentPage !== totalPages
-                  }"
-                  class="relative inline-flex items-center px-4 py-2 border text-sm font-medium"
-                >
-                  {{ totalPages }}
-                </button>
-              </template>
-              
-              <!-- Next Button -->
-              <button
-                @click="currentPage++"
-                :disabled="currentPage === totalPages"
-                :class="{ 'opacity-50 cursor-not-allowed': currentPage === totalPages }"
-                class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50"
-              >
-                <span class="sr-only">Next</span>
-                <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                  <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" />
-                </svg>
-              </button>
-            </nav>
-            
-            <!-- Page Info -->
-            <div class="hidden md:flex items-center ml-4 text-sm text-gray-700">
-              <span>Page {{ currentPage }} of {{ totalPages }}</span>
-              <span class="mx-2">•</span>
-              <span>{{ totalItems }} total properties</span>
-            </div>
-          </div>
+         
         </div>
       </div>
     </div>
@@ -380,13 +419,24 @@
 import { ref, computed, watch, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import api from '../services/api';
+import axios from 'axios';
+
+// Create axios instance for direct API calls
+const axiosInstance = axios.create({
+  baseURL: 'http://192.168.1.15:8000',
+  headers: {
+    'Accept': 'application/json',
+    'Content-Type': 'application/json',
+  }
+});
 
 const router = useRouter();
 
 // State
 const properties = ref([]);
-const isLoading = ref(true);
+const isLoading = ref(false);
 const error = ref(null);
+const filterTimeout = ref(null);
 const currentPage = ref(1);
 const perPage = 12;
 const totalItems = ref(0);
@@ -400,30 +450,193 @@ const filters = ref({
   types: [],
   minPrice: null,
   maxPrice: null,
-  bedrooms: null,
-  bathrooms: null,
-  features: []
+  minArea: null,
+  maxArea: null,
+  minUnits: null,
+  maxUnits: null,
+  deliveryStartDate: '',
+  deliveryEndDate: '',
+  wilaya: '',
+  baladia: '',
+  daira: ''
 });
 
-// Property types
+// Location data
+const wilayas = ref([]);
+const baladias = ref([]);
+const dairas = ref([]);
+const isLoadingLocations = ref(true);
+const isLoadingBaladias = ref(false);
+const isLoadingDairas = ref(false);
+const locationError = ref(null);
+
+// Load wilayas
+const loadWilayas = async () => {
+  try {
+    console.log('Loading wilayas...');
+    isLoadingLocations.value = true;
+    locationError.value = null;
+    
+    const response = await axios.get('/api/locations/wilayas');
+    console.log('Wilayas loaded:', response.data);
+    
+    if (Array.isArray(response.data)) {
+      wilayas.value = response.data;
+      console.log('Wilayas set successfully');
+    } else {
+      console.error('Unexpected response format:', response.data);
+      locationError.value = 'Failed to load wilayas: Invalid data format';
+    }
+  } catch (error) {
+    console.error('Error loading wilayas:', error);
+    const errorMsg = error.response?.data?.error || error.message || 'Failed to load wilayas';
+    locationError.value = errorMsg;
+    
+    if (error.response) {
+      console.error('Response data:', error.response.data);
+      console.error('Status:', error.response.status);
+      console.error('Headers:', error.response.headers);
+    } else if (error.request) {
+      console.error('No response received:', error.request);
+    }
+  } finally {
+    isLoadingLocations.value = false;
+  }
+};
+
+// Load baladias when wilaya is selected
+const loadBaladias = async (wilaya) => {
+  if (!wilaya) {
+    baladias.value = [];
+    dairas.value = [];
+    filters.value.baladia = '';
+    filters.value.daira = '';
+    return;
+  }
+  
+  try {
+    isLoadingBaladias.value = true;
+    locationError.value = null;
+    
+    const response = await axios.get(`/api/locations/baladias/${encodeURIComponent(wilaya)}`);
+    console.log(`Baladias for ${wilaya}:`, response.data);
+    
+    if (Array.isArray(response.data)) {
+      baladias.value = response.data;
+      dairas.value = [];
+      filters.value.baladia = '';
+      filters.value.daira = '';
+    } else {
+      console.error('Unexpected response format for baladias:', response.data);
+      locationError.value = 'Failed to load communes: Invalid data format';
+    }
+  } catch (error) {
+    console.error('Error loading baladias:', error);
+    const errorMsg = error.response?.data?.error || error.message || 'Failed to load communes';
+    locationError.value = errorMsg;
+    baladias.value = [];
+    dairas.value = [];
+    filters.value.baladia = '';
+    filters.value.daira = '';
+  } finally {
+    isLoadingBaladias.value = false;
+  }
+};
+
+// Load dairas when baladia is selected
+const loadDairas = async (wilaya, baladia) => {
+  if (!wilaya || !baladia) {
+    dairas.value = [];
+    filters.value.daira = '';
+    return;
+  }
+  
+  try {
+    isLoadingDairas.value = true;
+    locationError.value = null;
+    
+    const response = await axios.get(
+      `/api/locations/dairas/${encodeURIComponent(wilaya)}/${encodeURIComponent(baladia)}`
+    );
+    console.log(`Dairas for ${wilaya} / ${baladia}:`, response.data);
+    
+    if (Array.isArray(response.data)) {
+      dairas.value = response.data;
+      filters.value.daira = '';
+    } else {
+      console.error('Unexpected response format for dairas:', response.data);
+      locationError.value = 'Failed to load dairas: Invalid data format';
+    }
+  } catch (error) {
+    console.error('Error loading dairas:', error);
+    const errorMsg = error.response?.data?.error || error.message || 'Failed to load dairas';
+    locationError.value = errorMsg;
+    dairas.value = [];
+    filters.value.daira = '';
+  } finally {
+    isLoadingDairas.value = false;
+  }
+};
+
+// Handle wilaya change
+const onWilayaChange = () => {
+  console.log('Wilaya changed to:', filters.value.wilaya);
+  loadBaladias(filters.value.wilaya);
+};
+
+// Handle baladia change
+const onBaladiaChange = () => {
+  console.log('Baladia changed to:', filters.value.baladia);
+  loadDairas(filters.value.wilaya, filters.value.baladia);
+};
+
+// Watch for wilaya changes from other components
+watch(() => filters.value.wilaya, (newWilaya) => {
+  if (newWilaya) {
+    loadBaladias(newWilaya);
+  }
+});
+
+// Watch for baladia changes from other components
+watch(() => filters.value.baladia, (newBaladia, oldBaladia) => {
+  if (newBaladia && newBaladia !== oldBaladia) {
+    loadDairas(filters.value.wilaya, newBaladia);
+  }
+});
+
+// Load wilayas on component mount
+onMounted(() => {
+  console.log('Component mounted, loading wilayas...');
+  loadWilayas();
+});
+
+// Show error message if location loading fails
+watch(locationError, (newError) => {
+  if (newError) {
+    console.error('Location error:', newError);
+    // You could show a toast notification here if needed
+  }
+});
+
+// Types de biens
 const propertyTypes = [
-  { value: 'house', label: 'House' },
-  { value: 'apartment', label: 'Apartment' },
+  { value: 'house', label: 'Maison' },
+  { value: 'apartment', label: 'Appartement' },
   { value: 'villa', label: 'Villa' },
-  { value: 'condo', label: 'Condo' },
-  { value: 'townhouse', label: 'Townhouse' },
+  { value: 'condo', label: 'Condominium' },
+  { value: 'townhouse', label: 'Maison de ville' },
   { value: 'penthouse', label: 'Penthouse' },
-  { value: 'cabin', label: 'Cabin' },
-  { value: 'mansion', label: 'Mansion' },
+  { value: 'cabin', label: 'Chalet' },
+  { value: 'mansion', label: 'Manoir' },
   { value: 'loft', label: 'Loft' },
-  { value: 'farmhouse', label: 'Farmhouse' },
-  { value: 'brownstone', label: 'Brownstone' },
+  { value: 'farmhouse', label: 'Ferme' },
+  { value: 'brownstone', label: 'Immeuble en pierre' },
   { value: 'cottage', label: 'Cottage' }
 ];
 
-// Bedroom options
+// Options de chambres
 const bedroomOptions = [
-  { value: null, label: 'Any' },
+  { value: null, label: 'Tous' },
   { value: 1, label: '1+' },
   { value: 2, label: '2+' },
   { value: 3, label: '3+' },
@@ -431,9 +644,9 @@ const bedroomOptions = [
   { value: 5, label: '5+' }
 ];
 
-// Bathroom options
+// Options de salles de bain
 const bathroomOptions = [
-  { value: null, label: 'Any' },
+  { value: null, label: 'Toutes' },
   { value: 1, label: '1+' },
   { value: 2, label: '2+' },
   { value: 3, label: '3+' },
@@ -441,18 +654,18 @@ const bathroomOptions = [
   { value: 5, label: '5+' }
 ];
 
-// Features
+// Équipements
 const features = [
-  { value: 'pool', label: 'Swimming Pool' },
+  { value: 'pool', label: 'Piscine' },
   { value: 'garage', label: 'Garage' },
-  { value: 'garden', label: 'Garden' },
-  { value: 'fireplace', label: 'Fireplace' },
-  { value: 'gym', label: 'Gym' },
-  { value: 'security', label: '24/7 Security' },
-  { value: 'furnished', label: 'Furnished' },
-  { value: 'view', label: 'Scenic View' },
-  { value: 'elevator', label: 'Elevator' },
-  { value: 'balcony', label: 'Balcony' }
+  { value: 'garden', label: 'Jardin' },
+  { value: 'fireplace', label: 'Cheminée' },
+  { value: 'gym', label: 'Salle de sport' },
+  { value: 'security', label: 'Sécurité 24/7' },
+  { value: 'furnished', label: 'Meublé' },
+  { value: 'view', label: 'Vue panoramique' },
+  { value: 'elevator', label: 'Ascenseur' },
+  { value: 'balcony', label: 'Balcon' }
 ];
 
 // Fetch properties from API
@@ -461,11 +674,35 @@ const fetchProperties = async () => {
     isLoading.value = true;
     error.value = null;
     
-    // Make API call to fetch projects
-    const response = await api.getProjects(currentPage.value, perPage);
+    // Cancel any pending requests
+    if (window.axiosCancel) {
+      window.axiosCancel('Request canceled');
+    }
+    
+    // Prepare query parameters
+    const params = {
+      page: currentPage.value,
+      per_page: perPage,
+      ...(filters.value.wilaya && { wilaya: filters.value.wilaya }),
+      ...(filters.value.baladia && { commune: filters.value.baladia }),
+      ...(filters.value.daira && { daira: filters.value.daira }),
+      ...(filters.value.minPrice && { price_min: filters.value.minPrice }),
+      ...(filters.value.maxPrice && { price_max: filters.value.maxPrice }),
+      ...(filters.value.minArea && { surface_area_min: filters.value.minArea }),
+      ...(filters.value.maxArea && { surface_area_max: filters.value.maxArea }),
+      ...(filters.value.types && filters.value.types.length > 0 && { housing_type: filters.value.types.join(',') })
+    };
+    
+    // Make API call to fetch projects with filters
+    const response = await axiosInstance.get('/api/projects/filter', { 
+      params,
+      cancelToken: new axios.CancelToken((c) => {
+        window.axiosCancel = c;
+      })
+    });
     
     // Transform API response to match our component's expected format
-    const formattedData = response.data.map(project => ({
+    const formattedData = response.data.projects.map(project => ({
       id: project.id,
       name: project.name,
       location: project.location,
@@ -477,7 +714,7 @@ const fetchProperties = async () => {
       housing_type: project.housing_type,
       images: project.images.map(img => ({
         id: img.id,
-        url: img.image_path.startsWith('http') ? img.image_path : `http://192.168.1.8:8000${img.image_path}`,
+        url: img.image_path.startsWith('http') ? img.image_path : `http://192.168.1.15:8000${img.image_path}`,
         image_path: img.image_path,
         caption: img.caption
       })),
@@ -490,12 +727,13 @@ const fetchProperties = async () => {
     
     // Update component state with API data
     properties.value = formattedData;
-    totalItems.value = response.total || 0;
-    totalPages.value = response.last_page || 1;
+    totalItems.value = response.data.count || 0;
+    // Since we're not paginating on the server, we'll handle it on the client
+    totalPages.value = 1;
     
   } catch (err) {
     console.error('Error fetching properties:', err);
-    error.value = 'Failed to load properties. Please try again later.';
+    error.value = 'Échec du chargement des biens. Veuillez réessayer plus tard.';
     // Reset properties on error
     properties.value = [];
     totalItems.value = 0;
@@ -510,15 +748,38 @@ const navigateToProperty = (propertyId) => {
   router.push({ name: 'property-details', params: { id: propertyId } });
 };
 
-// Format price
+// Format location object/string into readable text
+const formatLocation = computed(() => (location) => {
+  if (!location) return '';
+  
+  try {
+    // If it's already a string, try to parse it as JSON
+    const locationObj = typeof location === 'string' ? JSON.parse(location) : location;
+    
+    // Extract address components
+    const parts = [
+      locationObj.street,
+      locationObj.baladia,
+      locationObj.daira,
+      locationObj.wilaya
+    ].filter(Boolean); // Remove any empty/undefined parts
+    
+    return parts.join(', ');
+  } catch (e) {
+    // If parsing fails or it's not an object, return as is
+    return typeof location === 'string' ? location : '';
+  }
+});
+
+// Formater le prix
 const formatPrice = (price) => {
-  if (!price) return 'Price on request';
-  return new Intl.NumberFormat('en-US', {
+  if (!price) return 'Prix sur demande';
+  return new Intl.NumberFormat('fr-DZ', {
     style: 'currency',
-    currency: 'USD',
+    currency: 'DZD',
     minimumFractionDigits: 0,
     maximumFractionDigits: 0
-  }).format(price);
+  }).format(price).replace('DZD', 'DA');
 };
 
 // Get first image URL from property
@@ -531,6 +792,39 @@ const getFirstImage = (property) => {
 // Filtered properties
 const filteredProperties = computed(() => {
   return properties.value.filter(property => {
+    // Number of units filter
+    if (filters.value.minUnits !== null && (property.num_units || 0) < filters.value.minUnits) {
+      return false;
+    }
+    if (filters.value.maxUnits !== null && (property.num_units || 0) > filters.value.maxUnits) {
+      return false;
+    }
+
+    // Surface area filter
+    if (filters.value.minArea !== null && (property.surface_area || 0) < filters.value.minArea) {
+      return false;
+    }
+    if (filters.value.maxArea !== null && (property.surface_area || 0) > filters.value.maxArea) {
+      return false;
+    }
+
+    // Delivery date filter
+    if (filters.value.deliveryStartDate && property.delivery_date) {
+      const deliveryDate = new Date(property.delivery_date);
+      const startDate = new Date(filters.value.deliveryStartDate);
+      if (deliveryDate < startDate) {
+        return false;
+      }
+    }
+    if (filters.value.deliveryEndDate && property.delivery_date) {
+      const deliveryDate = new Date(property.delivery_date);
+      const endDate = new Date(filters.value.deliveryEndDate);
+      endDate.setHours(23, 59, 59, 999); // Include the entire end day
+      if (deliveryDate > endDate) {
+        return false;
+      }
+    }
+
     // Search filter
     if (filters.value.search) {
       const searchTerm = filters.value.search.toLowerCase();
@@ -596,15 +890,34 @@ const paginatedProperties = computed(() => {
 
 // Reset all filters
 const resetFilters = () => {
+  // Reset all filters
   filters.value = {
     search: '',
     types: [],
     minPrice: null,
     maxPrice: null,
-    bedrooms: null,
-    bathrooms: null,
-    features: []
+    minArea: null,
+    maxArea: null,
+    minUnits: null,
+    maxUnits: null,
+    deliveryStartDate: '',
+    deliveryEndDate: '',
+    wilaya: '',
+    baladia: '',
+    daira: '',
+    baladias: [],
+    dairas: []
   };
+  
+  // Reset sort option
+  sortOption.value = 'featured';
+  
+  // Reset location dropdowns and reload wilayas
+  loadWilayas();
+  
+  // Reset current page and fetch properties
+  currentPage.value = 1;
+  fetchProperties();
 };
 
 // Watch for page changes
@@ -613,13 +926,19 @@ watch(currentPage, () => {
   fetchProperties();
 });
 
-// Watch for filter changes
-// Watch for filter changes
-watch([filters, sortOption], () => {
-  currentPage.value = 1;
-  // In a real app, you might want to refetch data when filters change
-  // fetchProperties();
-});
+// Watch for filter changes and refetch data when they change
+watch(
+  [() => filters.value, sortOption],
+  () => {
+    // Debounce the API call to avoid too many requests
+    clearTimeout(filterTimeout.value);
+    filterTimeout.value = setTimeout(() => {
+      currentPage.value = 1;
+      fetchProperties();
+    }, 300); // 300ms debounce
+  },
+  { deep: true }
+);
 
 // Fetch properties when component is mounted
 onMounted(() => {

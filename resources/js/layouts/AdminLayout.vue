@@ -8,7 +8,7 @@
             <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
             <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
           </svg>
-          Loading...
+          Chargement...
         </div>
       </div>
     </div>
@@ -90,7 +90,7 @@
           <div class="flex items-center space-x-4">
             <button class="p-2 text-gray-500 hover:text-gray-600 hover:bg-gray-100 rounded-full">
               <BellIcon class="h-5 w-5" />
-              <span class="sr-only">View notifications</span>
+              <span class="sr-only">Voir les notifications</span>
             </button>
             
             <!-- Profile dropdown -->
@@ -101,7 +101,7 @@
                   class="flex items-center max-w-xs text-sm rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500"
                   :class="{ 'bg-gray-100': isProfileMenuOpen }"
                 >
-                  <span class="sr-only">Open user menu</span>
+                  <span class="sr-only">Ouvrir le menu utilisateur</span>
                   <div class="h-8 w-8 rounded-full bg-purple-600 flex items-center justify-center text-white font-medium">
                     {{ userInitials }}
                   </div>
@@ -134,7 +134,7 @@
                       @click="isProfileMenuOpen = false"
                     >
                       <div class="flex items-center">
-                        <span>Your Profile</span>
+                        <span>Votre Profil</span>
                       </div>
                     </router-link>
                     <button
@@ -143,7 +143,7 @@
                       role="menuitem"
                     >
                       <div class="flex items-center">
-                        <span>Sign out</span>
+                        <span>Se déconnecter</span>
                       </div>
                     </button>
                   </div>
@@ -276,11 +276,11 @@ watch(() => route.path, async () => {
 
 // State
 const isMobileMenuOpen = ref(false);
-const pageTitle = ref('Dashboard');
+const pageTitle = ref('Tableau de bord');
 
 // Watch for route changes to update page title
 watch(() => route.meta, (newMeta) => {
-  pageTitle.value = newMeta.title || 'Dashboard';
+  pageTitle.value = newMeta.title || 'Tableau de bord';
 }, { immediate: true });
 
 // Navigation items based on user role and authentication
@@ -294,15 +294,15 @@ const navigation = computed(() => {
   const userRole = store.getters['auth/currentUser']?.role;
   
   const adminNav = [
-    { name: 'Dashboard', href: '/admin/dashboard', icon: 'HomeIcon' },
-    { name: 'Users', href: '/admin/users', icon: 'UserGroupIcon' },
-    { name: 'All Projects', href: '/admin/documents', icon: 'DocumentTextIcon' },
+    { name: 'Tableau de bord', href: '/admin/dashboard', icon: 'HomeIcon' },
+    { name: 'Utilisateurs', href: '/admin/users', icon: 'UserGroupIcon' },
+    { name: 'Tous les projets', href: '/admin/documents', icon: 'DocumentTextIcon' },
   ];
   
   const professionalNav = [
-    { name: 'Dashboard', href: '/admin/dashboard', icon: 'HomeIcon' },
-    { name: 'Projects', href: '/admin/projects', icon: 'HomeModernIcon' },
-    { name: 'Inquiries', href: '/admin/inquiries', icon: 'UserGroupIcon' },
+    { name: 'Tableau de bord', href: '/admin/dashboard', icon: 'HomeIcon' },
+    { name: 'Projets', href: '/admin/projects', icon: 'HomeModernIcon' },
+    { name: 'Demandes', href: '/admin/inquiries', icon: 'UserGroupIcon' },
   ];
   
   // Default to admin navigation if role is not recognized
@@ -353,7 +353,7 @@ const userInitials = computed(() => {
 // Get user display name
 const userName = computed(() => {
   const user = store.getters['auth/currentUser'];
-  return user?.name || user?.email || 'User';
+  return user?.name || user?.email || 'Utilisateur';
 });
 
 // Logout function

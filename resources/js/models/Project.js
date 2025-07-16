@@ -30,7 +30,7 @@ class Project {
     this.images = images.map(img => ({
       id: img.id,
       path: img.image_path,
-      url: `http://192.168.1.8:8000${img.image_path}`,
+      url: `http://192.168.1.15:8000${img.image_path}`,
       alt: `Property image ${img.id}`
     }));
     this.user = user;

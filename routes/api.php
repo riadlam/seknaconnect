@@ -4,6 +4,8 @@ use App\Http\Controllers\API\AuthController;
 use App\Http\Controllers\API\ProjectController;
 use App\Http\Controllers\API\ProjectImageController;
 use App\Http\Controllers\API\InquiryController;
+use App\Http\Controllers\API\ProjectFilterController;
+use App\Http\Controllers\API\LocationController;
 use Illuminate\Support\Facades\Route;
 
 // Public Routes
@@ -11,8 +13,15 @@ Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login',    [AuthController::class, 'login']);
 
 Route::get('/projects', [ProjectController::class, 'index']);
+Route::get('/projects/search', [ProjectController::class, 'searchByName']);
+Route::get('/projects/filter', [ProjectFilterController::class, 'filter']);
 Route::get('/projects/{id}', [ProjectController::class, 'show']);
 Route::post('/projects/{id}/inquiries', [InquiryController::class, 'store']);
+
+// Location routes
+Route::get('/locations/wilayas', [LocationController::class, 'getWilayas']);
+Route::get('/locations/baladias/{wilaya}', [LocationController::class, 'getBaladias']);
+Route::get('/locations/dairas/{wilaya}/{baladia}', [LocationController::class, 'getDairas']);
 
 // Authenticated Routes
 Route::middleware('auth:sanctum')->group(function () {
@@ -35,4 +44,5 @@ Route::middleware('auth:sanctum')->group(function () {
     // Admin routes
     Route::get('/admin/users', [AuthController::class, 'getUsers']);
     Route::delete('/admin/users/{id}', [AuthController::class, 'deleteUser']);
+    Route::post('/admin/users/{id}/verify', [AuthController::class, 'verifyUser']);
 });

@@ -34,13 +34,13 @@
           <!-- CTA Buttons -->
           <div class="flex flex-col sm:flex-row gap-4 animate-fadeInUp animation-delay-200">
             <a href="#featured-properties" class="inline-flex items-center justify-center px-8 py-4 border border-transparent text-base font-medium rounded-full text-white bg-purple-600 hover:bg-purple-700 transition-colors duration-300 transform hover:scale-105">
-              Explore Properties
+              Explorer les biens
               <svg class="ml-2 -mr-1 w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
                 <path fill-rule="evenodd" d="M10.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L12.586 11H5a1 1 0 110-2h7.586l-2.293-2.293a1 1 0 010-1.414z" clip-rule="evenodd"></path>
               </svg>
             </a>
             <a href="#contact" class="inline-flex items-center justify-center px-8 py-4 border-2 border-white/30 text-base font-medium rounded-full text-white hover:bg-white/10 transition-colors duration-300">
-              Contact Agent
+              Contacter un agent
               <svg class="ml-2 -mr-1 w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
               </svg>
@@ -56,7 +56,7 @@
         <button v-for="(_, index) in slides" :key="`indicator-${index}`"
                 @click="goToSlide(index)"
                 :class="['w-3 h-3 rounded-full transition-all duration-300', currentSlide === index ? 'bg-white w-8' : 'bg-white/50 hover:bg-white/80 w-3']"
-                :aria-label="`Go to slide ${index + 1}`">
+                :aria-label="`Aller à la diapositive ${index + 1}`">
         </button>
       </div>
     </div>
@@ -83,23 +83,23 @@ export default {
         {
           image: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80',
           alt: 'Luxury Modern House',
-          tag: 'Luxury Living',
-          heading: 'Discover Your Dream Home',
-          description: 'Find the perfect property that matches your lifestyle and budget from our exclusive collection.'
+          tag: 'Vie de Luxe',
+          heading: 'Découvrez Votre Maison de Rêve',
+          description: 'Trouvez la propriété parfaite qui correspond à votre style de vie et à votre budget parmi notre collection exclusive.'
         },
         {
-          image: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80',
+          image: 'https://prod.rockmedialibrary.com/api/public/content/ff061825fa8e44bf8108de5c786c0062?v=4c4f7c7a',
           alt: 'Modern Apartment Interior',
-          tag: 'Modern Design',
-          heading: 'Contemporary Living Spaces',
-          description: 'Experience the perfect blend of comfort and modern architecture in our premium properties.'
+          tag: 'Design Moderne',
+          heading: 'Espaces de Vie Contemporains',
+          description: 'Découvrez la parfaite alliance entre confort et architecture moderne dans nos propriétés haut de gamme.'
         },
         {
           image: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80',
           alt: 'Luxury Villa with Pool',
-          tag: 'Premium Collection',
-          heading: 'Luxury Redefined',
-          description: 'Indulge in our exclusive collection of luxury homes with premium amenities and stunning views.'
+          tag: 'Collection Premium',
+          heading: 'Le Luxe Redéfini',
+          description: 'Offrez-vous notre collection exclusive de maisons de luxe avec des équipements haut de gamme et des vues à couper le souffle.'
         }
       ]
     }

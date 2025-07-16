@@ -4,7 +4,7 @@
     <div class="md:flex md:items-center md:justify-between">
       <div class="min-w-0 flex-1">
         <h2 class="text-2xl font-bold leading-7 text-gray-900 sm:truncate sm:text-3xl sm:tracking-tight">
-          Dashboard
+Tableau de bord
         </h2>
       </div>
     </div>
@@ -43,8 +43,8 @@
       <div class="px-4 py-5 sm:px-6 border-b border-gray-200">
         <div class="flex items-center justify-between">
           <div>
-            <h3 class="text-lg font-medium leading-6 text-gray-900">Recent Projects</h3>
-            <p class="mt-1 text-sm text-gray-500">A list of your most recent property projects.</p>
+            <h3 class="text-lg font-medium leading-6 text-gray-900">Projets Récents</h3>
+            <p class="mt-1 text-sm text-gray-500">Liste de vos projets immobiliers les plus récents.</p>
           </div>
           <button 
             @click="fetchProjects"
@@ -55,7 +55,7 @@
               <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
               <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
             </svg>
-            {{ loading ? 'Refreshing...' : 'Refresh' }}
+            {{ loading ? 'Actualisation...' : 'Actualiser' }}
           </button>
         </div>
       </div>
@@ -64,7 +64,7 @@
           <div class="flex justify-center">
             <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>
           </div>
-          <p class="mt-2 text-sm text-gray-500">Loading projects...</p>
+          <p class="mt-2 text-sm text-gray-500">Chargement des projets...</p>
         </div>
         <div v-else-if="error" class="px-4 py-12 text-center">
           <div class="text-red-500">
@@ -76,7 +76,7 @@
               @click="fetchProjects"
               class="mt-4 inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
             >
-              Try Again
+              Réessayer
             </button>
           </div>
         </div>
@@ -84,8 +84,8 @@
           <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 mx-auto text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
           </svg>
-          <h3 class="mt-2 text-sm font-medium text-gray-900">No projects</h3>
-          <p class="mt-1 text-sm text-gray-500">Get started by creating a new project.</p>
+          <h3 class="mt-2 text-sm font-medium text-gray-900">Aucun projet</h3>
+          <p class="mt-1 text-sm text-gray-500">Commencez par créer un nouveau projet.</p>
           <div class="mt-6">
             <button 
               @click="$router.push('/admin/projects/create')" 
@@ -94,7 +94,7 @@
               <svg xmlns="http://www.w3.org/2000/svg" class="-ml-1 mr-2 h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                 <path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd" />
               </svg>
-              New Project
+              Nouveau Projet
             </button>
           </div>
         </div>
@@ -117,12 +117,12 @@
                   </p>
                   <p class="mt-2 flex items-center text-sm text-gray-500 sm:mt-0 sm:ml-6">
                     <component :is="getIconComponent('MapPinIcon')" class="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-400" />
-                    {{ project.location || 'Location not specified' }}
+                    {{ project.location || 'Localisation non spécifiée' }}
                   </p>
                 </div>
                 <div class="mt-2 flex items-center text-sm text-gray-500 sm:mt-0">
                   <component :is="getIconComponent('CalendarIcon')" class="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-400" />
-                  <p>Added {{ project.date }}</p>
+                  <p>Ajouté {{ project.date }}</p>
                 </div>
               </div>
               <div v-if="project.images && project.images.length > 0" class="mt-2">
@@ -131,7 +131,7 @@
                     v-for="(image, index) in project.images.slice(0, 3)" 
                     :key="index"
                     :src="image.image_path" 
-                    :alt="image.caption || 'Project image'"
+                    :alt="image.caption || 'Image du projet'"
                     class="inline-block h-8 w-8 rounded-full ring-2 ring-white object-cover"
                   />
                   <span v-if="project.images.length > 3" class="inline-flex items-center justify-center h-8 w-8 rounded-full bg-gray-200 text-gray-600 text-xs font-medium">
@@ -179,7 +179,7 @@ const fetchProjects = async () => {
     projects.value = response.data;
   } catch (err) {
     console.error('Error fetching projects:', err);
-    error.value = 'Failed to load projects. Please try again later.';
+    error.value = 'Échec du chargement des projets. Veuillez réessayer plus tard.';
   } finally {
     loading.value = false;
   }
@@ -191,13 +191,13 @@ const formatDate = (dateString) => {
   const now = new Date();
   const diffInDays = Math.floor((now - date) / (1000 * 60 * 60 * 24));
   
-  if (diffInDays === 0) return 'Today';
-  if (diffInDays === 1) return 'Yesterday';
-  if (diffInDays < 7) return `${diffInDays} days ago`;
+  if (diffInDays === 0) return "Aujourd'hui";
+  if (diffInDays === 1) return 'Hier';
+  if (diffInDays < 7) return `Il y a ${diffInDays} jour${diffInDays > 1 ? 's' : ''}`;
   
   const diffInWeeks = Math.floor(diffInDays / 7);
-  if (diffInWeeks === 1) return '1 week ago';
-  if (diffInWeeks < 4) return `${diffInWeeks} weeks ago`;
+  if (diffInWeeks === 1) return 'Il y a 1 semaine';
+  if (diffInWeeks < 4) return `Il y a ${diffInWeeks} semaines`;
   
   return date.toLocaleDateString();
 };
@@ -233,25 +233,25 @@ const stats = computed(() => {
 
   return [
     { 
-      name: 'Total Projects', 
+      name: 'Projets Totaux', 
       value: totalProjects.toString(), 
       icon: 'HomeModernIcon', 
       iconBackground: 'rounded-md bg-purple-500 p-3' 
     },
     // { 
-    //   name: 'Active Projects', 
+    //   name: 'Projets Actifs', 
     //   value: activeProjects.toString(), 
     //   icon: 'HomeModernIcon', 
     //   iconBackground: 'rounded-md bg-green-500 p-3' 
     // },
     { 
-      name: 'Total Clients', 
+      name: 'Clients Totaux', 
       value: totalClients.toString(), 
       icon: 'UserGroupIcon', 
       iconBackground: 'rounded-md bg-blue-500 p-3' 
     },
     // { 
-    //   name: 'Revenue', 
+    //   name: 'Revenu', 
     //   value: `$${totalRevenue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`, 
     //   icon: 'DocumentTextIcon', 
     //   iconBackground: 'rounded-md bg-yellow-500 p-3' 

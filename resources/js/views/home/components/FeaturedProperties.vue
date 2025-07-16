@@ -11,14 +11,14 @@
           <svg class="w-4 h-4 mr-1.5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
             <path fill-rule="evenodd" d="M5 2a1 1 0 011 1v1h1a1 1 0 010 2H6v1a1 1 0 01-2 0V6H3a1 1 0 010-2h1V3a1 1 0 011-1zm0 10a1 1 0 011 1v1h1a1 1 0 110 2H6v1a1 1 0 11-2 0v-1H3a1 1 0 110-2h1v-1a1 1 0 011-1zM12 2a1 1 0 01.967.744L14.146 7.2 17.5 9.134a1 1 0 010 1.732l-3.354 1.935-1.18 4.355a1 1 0 01-1.933 0L9.854 12.8 6.5 10.866a1 1 0 010-1.732l3.354-1.935 1.18-4.355A1 1 0 0112 2z" clip-rule="evenodd" />
           </svg>
-          Featured Properties
+          Propriétés en Vedette
         </span>
         <h2 class="text-4xl font-extrabold text-gray-900 sm:text-5xl md:text-6xl">
-          <span class="block">Discover Your</span>
-          <span class="block text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-indigo-600">Dream Home</span>
+          <span class="block">Découvrez Votre</span>
+          <span class="block text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-indigo-600">Maison de Rêve</span>
         </h2>
         <p class="mt-4 text-xl text-gray-500 max-w-2xl mx-auto">
-          Explore our handpicked selection of premium properties that match your lifestyle and budget.
+          Découvrez notre sélection de propriétés haut de gamme qui correspondent à votre style de vie et à votre budget.
         </p>
       </div>
 
@@ -35,7 +35,7 @@
               v-model="searchQuery"
               type="text"
               class="block w-full pl-10 pr-3 py-3 border border-gray-300 rounded-lg bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-              placeholder="Search by location, property type, etc..."
+              placeholder="Rechercher par localisation, type de propriété, etc..."
             >
           </div>
         </div>
@@ -93,7 +93,7 @@
             </template>
             <template v-else-if="filteredProperties.length === 0">
               <div class="w-full text-center py-8 text-gray-500">
-                No properties found matching your criteria.
+                Aucune propriété ne correspond à vos critères.
               </div>
             </template>
             <template v-else>
@@ -146,7 +146,7 @@
           to="/properties" 
           class="inline-flex items-center px-8 py-3 border border-transparent text-base font-medium rounded-full shadow-sm text-white bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 transition-all duration-200 transform hover:-translate-y-0.5 hover:shadow-lg"
         >
-          View All Properties
+          Voir toutes les propriétés
           <svg class="ml-2 -mr-1 w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
           </svg>
@@ -187,7 +187,7 @@ export default {
         error.value = null;
         
         // Get all projects using a direct fetch to ensure we get the raw data
-        const response = await fetch('http://192.168.1.8:8000/api/projects', {
+        const response = await fetch('http://192.168.1.15:8000/api/projects', {
           headers: {
             'Accept': 'application/json'
           }
@@ -264,9 +264,9 @@ export default {
     
     // Property filters
     const propertyFilters = [
-      { id: 'all', label: 'All Properties' },
-      { id: 'featured', label: 'Featured' },
-      { id: 'new', label: 'New Listings' },
+      { id: 'all', label: 'Toutes les propriétés' },
+      { id: 'featured', label: 'En vedette' },
+      { id: 'new', label: 'Nouvelles annonces' },
     ];
     
     // Return all properties without filtering

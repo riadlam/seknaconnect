@@ -55,7 +55,7 @@
         <div class="absolute top-3 sm:top-4 left-3 sm:left-4 flex flex-col gap-1">
           
           <span v-if="property.featured" class="inline-flex items-center px-2.5 py-0.5 text-xs sm:text-sm font-semibold bg-amber-400 text-amber-900 rounded-full shadow">
-            Featured
+            En Vedette
           </span>
         </div>
       </div>
@@ -103,7 +103,7 @@
       <!-- CTA -->
       <div class="mt-4">
         <button class="w-full py-2.5 px-4 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white font-medium rounded-lg shadow-md hover:shadow-lg transition-all duration-300 flex items-center justify-center">
-          <span>View Details</span>
+          <span>Voir les détails</span>
           <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
           </svg>
@@ -133,12 +133,12 @@ export default {
       required: true,
       default: () => ({
         id: null,
-        title: 'No Title',
-        location: 'Location not specified',
-        price: 'Price on request',
+        title: 'Sans titre',
+        location: 'Localisation non spécifiée',
+        price: 'Prix sur demande',
         image: 'https://via.placeholder.com/600x400?text=No+Image',
         alt: 'Property image',
-        area: 'N/A',
+        area: 'N/D',
         type: 'Property',
         bedrooms: 0,
         bathrooms: 0,

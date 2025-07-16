@@ -74,16 +74,78 @@
                     />
                   </div>
 
-                  <!-- Location -->
-                  <div class="sm:col-span-2">
-                    <label for="location" class="block text-sm font-medium text-gray-700">Location *</label>
-                    <input
-                      type="text"
-                      id="location"
-                      v-model="formData.location"
-                      class="mt-1 block w-full rounded-lg border-2 border-gray-200 bg-white px-4 py-2.5 text-gray-700 placeholder-gray-400 transition-all duration-200 focus:border-purple-600 focus:outline-none focus:ring-2 focus:ring-purple-200 focus:ring-opacity-50 sm:text-sm"
-                      placeholder="Enter project location"
-                    />
+                  <!-- Wilaya -->
+                  <div>
+                    <label for="wilaya" class="block text-sm font-medium text-gray-700">Wilaya *</label>
+                    <div class="relative mt-1">
+                      <select
+                        id="wilaya"
+                        v-model="formData.wilaya"
+                        class="block w-full appearance-none rounded-lg border-2 border-gray-200 bg-white px-4 py-2.5 text-gray-700 placeholder-gray-400 transition-all duration-200 focus:border-purple-600 focus:outline-none focus:ring-2 focus:ring-purple-200 focus:ring-opacity-50 sm:text-sm"
+                        :disabled="isLoadingLocations"
+                        @change="onWilayaChange"
+                      >
+                        <option value="">Sélectionner une wilaya</option>
+                        <option v-for="wilaya in wilayas" :key="'w-'+wilaya" :value="wilaya">
+                          {{ wilaya }}
+                        </option>
+                      </select>
+                      <div v-if="isLoadingLocations" class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                        <svg class="animate-spin h-4 w-4 text-purple-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <!-- Baladia -->
+                  <div>
+                    <label for="baladia" class="block text-sm font-medium text-gray-700">Commune *</label>
+                    <div class="relative mt-1">
+                      <select
+                        id="baladia"
+                        v-model="formData.baladia"
+                        :disabled="!formData.wilaya || isLoadingBaladias"
+                        class="block w-full appearance-none rounded-lg border-2 border-gray-200 bg-white px-4 py-2.5 text-gray-700 placeholder-gray-400 transition-all duration-200 focus:border-purple-600 focus:outline-none focus:ring-2 focus:ring-purple-200 focus:ring-opacity-50 sm:text-sm"
+                        @change="onBaladiaChange"
+                      >
+                        <option value="">Sélectionner une commune</option>
+                        <option v-for="baladia in baladias" :key="'b-'+baladia" :value="baladia">
+                          {{ baladia }}
+                        </option>
+                      </select>
+                      <div v-if="isLoadingBaladias" class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                        <svg class="animate-spin h-4 w-4 text-purple-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <!-- Daira -->
+                  <div>
+                    <label for="daira" class="block text-sm font-medium text-gray-700">Daira</label>
+                    <div class="relative mt-1">
+                      <select
+                        id="daira"
+                        v-model="formData.daira"
+                        :disabled="!formData.baladia || isLoadingDairas"
+                        class="block w-full appearance-none rounded-lg border-2 border-gray-200 bg-white px-4 py-2.5 text-gray-700 placeholder-gray-400 transition-all duration-200 focus:border-purple-600 focus:outline-none focus:ring-2 focus:ring-purple-200 focus:ring-opacity-50 sm:text-sm"
+                      >
+                        <option value="">Sélectionner une daira</option>
+                        <option v-for="daira in dairas" :key="'d-'+daira" :value="daira">
+                          {{ daira }}
+                        </option>
+                      </select>
+                      <div v-if="isLoadingDairas" class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                        <svg class="animate-spin h-4 w-4 text-purple-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                      </div>
+                    </div>
                   </div>
 
                   <!-- Delivery Date -->
@@ -253,10 +315,11 @@
 </template>
 
 <script setup>
-import { ref, computed, watch } from 'vue';
+import { ref, computed, watch, onMounted, nextTick } from 'vue';
+import { useStore } from 'vuex';
+import axios from 'axios';
 import { Dialog, DialogPanel, DialogTitle, TransitionChild, TransitionRoot } from '@headlessui/vue';
 import { XMarkIcon } from '@heroicons/vue/24/outline';
-import axios from 'axios';
 
 const props = defineProps({
   isOpen: {
@@ -274,13 +337,16 @@ const emit = defineEmits(['close', 'submit']);
 const formData = ref({
   name: '',
   housing_type: '',
-  num_units: '',
-  location: '',
+  num_units: null,
+  wilaya: '',
+  baladia: '',
+  daira: '',
   delivery_date: '',
-  price: '',
-  surface_area: '',
+  price: null,
+  surface_area: null,
   description: '',
-  captions: []
+  images: [],
+  image_captions: []
 });
 
 const previewImages = ref([]);
@@ -292,7 +358,18 @@ const closeModal = () => {
   emit('close');
 };
 
-const isEditing = computed(() => !!props.project);
+const isEditing = computed(() => Boolean(props.project));
+
+const store = useStore();
+
+// Location data and loading states
+const wilayas = ref([]);
+const baladias = ref([]);
+const dairas = ref([]);
+const isLoadingLocations = ref(false);
+const isLoadingBaladias = ref(false);
+const isLoadingDairas = ref(false);
+const locationError = ref(null);
 
 const submitForm = async () => {
   // Reset messages
@@ -300,17 +377,17 @@ const submitForm = async () => {
   successMessage.value = '';
   
   // Basic validation
-  if (!formData.value.name || !formData.value.housing_type || !formData.value.num_units || !formData.value.location) {
-    errorMessage.value = 'Please fill in all required fields';
+  if (!formData.value.name || !formData.value.housing_type || !formData.value.num_units || !formData.value.wilaya || !formData.value.baladia || !formData.value.daira) {
+    errorMessage.value = 'Veuillez remplir tous les champs obligatoires';
     return;
   }
   
   isSubmitting.value = true;
   
   try {
-    const token = localStorage.getItem('token');
+    const token = store.state.auth.token;
     if (!token) {
-      throw new Error('Authentication token not found. Please log in again.');
+      throw new Error('Veuillez vous reconnecter');
     }
     
     const headers = {
@@ -333,18 +410,32 @@ const submitForm = async () => {
       });
       
       response = await axios.put(`/api/projects/${props.project.id}`, payload, { headers });
-      successMessage.value = 'Project updated successfully!';
+      successMessage.value = 'Projet mis à jour avec succès !';
     } else {
       // For new project, use FormData for file uploads
-      headers['Content-Type'] = 'multipart/form-data';
       const formPayload = new FormData();
       
-      // Append form data (except captions)
+      // Add the main project data
       Object.keys(formData.value).forEach(key => {
-        if (key !== 'captions' && formData.value[key] !== null && formData.value[key] !== undefined) {
+        if (key === 'wilaya' || key === 'baladia' || key === 'daira') {
+          // Skip these as we'll add them separately
+          return;
+        }
+        if (key !== 'images' && key !== 'image_captions') {
           formPayload.append(key, formData.value[key]);
         }
       });
+      
+      // Add location fields separately
+      if (formData.value.wilaya) {
+        formPayload.append('location[wilaya]', formData.value.wilaya);
+      }
+      if (formData.value.baladia) {
+        formPayload.append('location[commune]', formData.value.baladia);
+      }
+      if (formData.value.daira) {
+        formPayload.append('location[daira]', formData.value.daira);
+      }
       
       // Append images and captions
       previewImages.value.forEach((file, index) => {
@@ -355,8 +446,15 @@ const submitForm = async () => {
         }
       });
       
-      response = await axios.post('/api/projects', formPayload, { headers });
-      successMessage.value = 'Project created successfully!';
+      // For POST requests, let the browser set the Content-Type with the correct boundary
+      const postHeaders = { ...headers };
+      delete postHeaders['Content-Type'];
+      
+      response = await axios.post('/api/projects', formPayload, { 
+        headers: postHeaders,
+      });
+      
+      successMessage.value = 'Projet créé avec succès !';
     }
     
     // Reset form and close dialog after a short delay
@@ -369,7 +467,7 @@ const submitForm = async () => {
   } catch (error) {
     console.error(`Error ${isEditing.value ? 'updating' : 'creating'} project:`, error);
     errorMessage.value = error.response?.data?.message || 
-      `Failed to ${isEditing.value ? 'update' : 'create'} project. Please try again.`;
+      `Échec de la ${isEditing.value ? 'mise à jour' : 'création'} du projet. Veuillez réessayer.`;
   } finally {
     isSubmitting.value = false;
   }
@@ -380,13 +478,16 @@ const resetForm = () => {
   formData.value = {
     name: '',
     housing_type: '',
-    num_units: '',
-    location: '',
+    num_units: null,
+    wilaya: '',
+    baladia: '',
+    daira: '',
     delivery_date: '',
-    price: '',
-    surface_area: '',
+    price: null,
+    surface_area: null,
     description: '',
-    captions: []
+    images: [],
+    image_captions: []
   };
   previewImages.value = [];
   errorMessage.value = '';
@@ -433,13 +534,138 @@ const removeImage = (index) => {
   previewImages.value.splice(index, 1);
 };
 
+// Load wilayas on component mount
+onMounted(() => {
+  loadWilayas();
+});
+
+// Load wilayas
+const loadWilayas = async () => {
+  try {
+    isLoadingLocations.value = true;
+    locationError.value = null;
+    
+    const response = await axios.get('/api/locations/wilayas');
+    
+    if (Array.isArray(response.data)) {
+      wilayas.value = response.data;
+    } else {
+      console.error('Unexpected response format:', response.data);
+      locationError.value = 'Failed to load wilayas: Invalid data format';
+    }
+  } catch (error) {
+    console.error('Error loading wilayas:', error);
+    const errorMsg = error.response?.data?.error || error.message || 'Failed to load wilayas';
+    locationError.value = errorMsg;
+  } finally {
+    isLoadingLocations.value = false;
+  }
+};
+
+// Load baladias when wilaya is selected
+const loadBaladias = async (wilaya) => {
+  if (!wilaya) {
+    baladias.value = [];
+    dairas.value = [];
+    formData.value.baladia = '';
+    formData.value.daira = '';
+    return;
+  }
+  
+  try {
+    isLoadingBaladias.value = true;
+    locationError.value = null;
+    
+    const response = await axios.get(`/api/locations/baladias/${encodeURIComponent(wilaya)}`);
+    
+    if (Array.isArray(response.data)) {
+      baladias.value = response.data;
+      dairas.value = [];
+      formData.value.baladia = '';
+      formData.value.daira = '';
+    } else {
+      console.error('Unexpected response format for baladias:', response.data);
+      locationError.value = 'Failed to load communes: Invalid data format';
+    }
+  } catch (error) {
+    console.error('Error loading baladias:', error);
+    const errorMsg = error.response?.data?.error || error.message || 'Failed to load communes';
+    locationError.value = errorMsg;
+    baladias.value = [];
+    dairas.value = [];
+    formData.value.baladia = '';
+    formData.value.daira = '';
+  } finally {
+    isLoadingBaladias.value = false;
+  }
+};
+
+// Load dairas when baladia is selected
+const loadDairas = async (wilaya, baladia) => {
+  if (!wilaya || !baladia) {
+    dairas.value = [];
+    formData.value.daira = '';
+    return;
+  }
+  
+  try {
+    isLoadingDairas.value = true;
+    locationError.value = null;
+    
+    const response = await axios.get(
+      `/api/locations/dairas/${encodeURIComponent(wilaya)}/${encodeURIComponent(baladia)}`
+    );
+    
+    if (Array.isArray(response.data)) {
+      dairas.value = response.data;
+      formData.value.daira = '';
+    } else {
+      console.error('Unexpected response format for dairas:', response.data);
+      locationError.value = 'Failed to load dairas: Invalid data format';
+    }
+  } catch (error) {
+    console.error('Error loading dairas:', error);
+    const errorMsg = error.response?.data?.error || error.message || 'Failed to load dairas';
+    locationError.value = errorMsg;
+    dairas.value = [];
+    formData.value.daira = '';
+  } finally {
+    isLoadingDairas.value = false;
+  }
+};
+
+// Handle wilaya change
+const onWilayaChange = () => {
+  loadBaladias(formData.value.wilaya);};
+
+// Handle baladia change
+const onBaladiaChange = () => {
+  loadDairas(formData.value.wilaya, formData.value.baladia);};
+
 // Initialize form when dialog is opened or project changes
-watch([() => props.isOpen, () => props.project], ([isOpen, project]) => {
+watch([() => props.isOpen, () => props.project], async ([isOpen, project]) => {
   if (isOpen) {
     if (project) {
+      // Try to parse the location if it exists
+      let location = {};
+      if (project.location) {
+        try {
+          location = JSON.parse(project.location);
+        } catch (e) {
+          console.warn('Could not parse location:', e);
+        }
+      }
+      
       // Populate form with project data for editing
-      const { id, user_id, created_at, updated_at, images, user, ...projectData } = project;
-      formData.value = { ...formData.value, ...projectData };
+      const { id, user_id, created_at, updated_at, images, user, location: locationStr, ...projectData } = project;
+      
+      formData.value = { 
+        ...formData.value, 
+        ...projectData,
+        wilaya: location.wilaya || '',
+        baladia: location.commune || '',
+        daira: location.daira || ''
+      };
       
       // Set preview images from existing project
       previewImages.value = (images || []).map(img => ({
@@ -447,6 +673,32 @@ watch([() => props.isOpen, () => props.project], ([isOpen, project]) => {
         caption: img.caption,
         id: img.id
       }));
+      
+      // Load baladias and dairas if wilaya is set
+      if (formData.value.wilaya) {
+        // Store the selected values before loading
+        const selectedBaladia = formData.value.baladia;
+        const selectedDaira = formData.value.daira;
+        
+        // Load baladias first
+        await loadBaladias(formData.value.wilaya);
+        
+        // If we have a selected baladia, load its dairas and then set the daira
+        if (selectedBaladia) {
+          await loadDairas(formData.value.wilaya, selectedBaladia);
+          
+          // Set the baladia and daira after the options are loaded
+          // Use $nextTick to ensure the DOM is updated with the new options
+          await nextTick();
+          formData.value.baladia = selectedBaladia;
+          
+          if (selectedDaira) {
+            // Use another $nextTick to ensure baladia is set before setting daira
+            await nextTick();
+            formData.value.daira = selectedDaira;
+          }
+        }
+      }
     } else {
       resetForm();
     }
