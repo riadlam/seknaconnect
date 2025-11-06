@@ -45,7 +45,7 @@ class Project {
     this.images = images.map(img => ({
       id: img.id,
       path: img.image_path,
-      url: `http://172.16.12.249:8000${img.image_path}`,
+      url: `http://sekna.soexplast.com${img.image_path}`,
       alt: `Property image ${img.id}`
     }));
     this.user = user;

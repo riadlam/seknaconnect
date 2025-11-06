@@ -1,7 +1,7 @@
 export default {
   // API Configuration
   api: {
-    baseURL: 'http://172.16.12.249:8000/api',
+    baseURL: 'http://sekna.soexplast.com/api',
     timeout: 10000, // 10 seconds
     endpoints: {
       projects: '/projects',
@@ -35,5 +35,5 @@ export default {
 export const getImageUrl = (path) => {
   if (!path) return '';
   if (path.startsWith('http')) return path;
-  return `http://172.16.12.249:8000${path}`;
+  return `http://sekna.soexplast.com${path}`;
 };

@@ -319,7 +319,7 @@ export default {
         error.value = null;
         
         // Get all projects using a direct fetch to ensure we get the raw data
-        const response = await fetch('http://172.16.12.249:8000/api/projects', {
+        const response = await fetch('http://sekna.soexplast.com/api/projects', {
           headers: {
             'Accept': 'application/json'
           }

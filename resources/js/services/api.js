@@ -4,7 +4,7 @@ import axios from 'axios';
 // Create axios instance with base URL from config
 // Use direct URL since we're having config import issues
 const apiClient = axios.create({
-  baseURL: 'http://172.16.12.249:8000',
+  baseURL: 'http://sekna.soexplast.com',
   timeout: 30000, // 30 seconds
   headers: {
     'Accept': 'application/json',
