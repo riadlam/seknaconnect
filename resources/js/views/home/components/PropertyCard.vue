@@ -72,11 +72,11 @@
             {{ property.type }}
           </p>
           <div class="flex items-center text-sm mt-1 text-gray-600 flex-wrap gap-1">
-            <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg class="w-4 h-4 text-gray-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
             </svg>
-            <span class="ml-1">{{ property.location }}</span>
+            <span class="ml-1 line-clamp-1">{{ formatLocation(property.location) }}</span>
           </div>
         </div>
         <div class="text-right">
@@ -155,11 +155,37 @@ export default {
     const isFavorite = ref(false);
 
     const formatPrice = (price) => {
-      if (!price) return 'N/A';
+      if (!price && price !== 0) return 'N/A';
       // Remove any existing currency symbols and convert to number
       const numericValue = Number(String(price).replace(/[^0-9.-]+/g, ""));
+      if (isNaN(numericValue)) return 'N/A';
       // Format with DZD symbol and thousand separators
       return `${numericValue.toLocaleString('ar-DZ')} DZD`;
+    };
+
+    const formatLocation = (location) => {
+      if (!location) return 'Localisation non spécifiée';
+      
+      try {
+        // If location is a string, try to parse it as JSON
+        const locationObj = typeof location === 'string' ? JSON.parse(location) : location;
+        
+        // Extract the address components we want to display
+        const { wilaya, commune, daira, address } = locationObj;
+        
+        // Build the address parts array, filtering out any empty values
+        const addressParts = [];
+        if (address) addressParts.push(address);
+        if (commune) addressParts.push(commune);
+        if (daira && daira !== commune) addressParts.push(daira);
+        if (wilaya) addressParts.push(wilaya);
+        
+        // Join the parts with commas and return
+        return addressParts.join(', ');
+      } catch (e) {
+        // If parsing fails or location is a simple string, return it as is
+        return location;
+      }
     };
 
     const viewPropertyDetails = () => {
@@ -199,10 +225,11 @@ export default {
       isHovered,
       showShareOptions,
       isFavorite,
+      formatPrice,
+      formatLocation,
       viewPropertyDetails,
       handleImageError,
-      toggleFavorite,
-      formatPrice
+      toggleFavorite
     };
   }
 }

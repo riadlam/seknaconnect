@@ -33,18 +33,18 @@
 
           <!-- CTA Buttons -->
           <div class="flex flex-col sm:flex-row gap-4 animate-fadeInUp animation-delay-200">
-            <a href="#featured-properties" class="inline-flex items-center justify-center px-8 py-4 border border-transparent text-base font-medium rounded-full text-white bg-purple-600 hover:bg-purple-700 transition-colors duration-300 transform hover:scale-105">
+            <router-link to="/properties" class="inline-flex items-center justify-center px-8 py-4 border border-transparent text-base font-medium rounded-full text-white bg-purple-600 hover:bg-purple-700 transition-colors duration-300 transform hover:scale-105">
               Explorer les biens
               <svg class="ml-2 -mr-1 w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
                 <path fill-rule="evenodd" d="M10.293 5.293a1 1 0 011.414 0l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414-1.414L12.586 11H5a1 1 0 110-2h7.586l-2.293-2.293a1 1 0 010-1.414z" clip-rule="evenodd"></path>
               </svg>
-            </a>
-            <a href="#contact" class="inline-flex items-center justify-center px-8 py-4 border-2 border-white/30 text-base font-medium rounded-full text-white hover:bg-white/10 transition-colors duration-300">
+            </router-link>
+            <router-link to="/contact" class="inline-flex items-center justify-center px-8 py-4 border-2 border-white/30 text-base font-medium rounded-full text-white hover:bg-white/10 transition-colors duration-300">
               Contacter un agent
               <svg class="ml-2 -mr-1 w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
               </svg>
-            </a>
+            </router-link>
           </div>
         </div>
       </div>
@@ -63,8 +63,8 @@
 
     <!-- Scroll Down Indicator -->
     <div class="absolute bottom-8 right-8 z-10 hidden md:block">
-      <a href="#featured-properties" class="flex flex-col items-center text-white/70 hover:text-white transition-colors group">
-        <span class="text-sm mb-2">Scroll Down</span>
+      <a @click="scrollToFeatured" class="flex flex-col items-center text-white/70 hover:text-white transition-colors group cursor-pointer">
+        <span class="text-sm mb-2">Défiler vers le bas</span>
         <div class="w-6 h-10 border-2 border-white/50 rounded-full flex justify-center p-1 group-hover:border-white transition-colors">
           <div class="w-1 h-2 bg-white rounded-full animate-bounce"></div>
         </div>
@@ -127,6 +127,16 @@ export default {
       }
       this.currentSlide = index;
       this.startSlider();
+    },
+    scrollToFeatured() {
+      // Scroll to featured properties section on the same page
+      const featuredSection = document.querySelector('.featured-properties-section');
+      if (featuredSection) {
+        featuredSection.scrollIntoView({ behavior: 'smooth' });
+      } else {
+        // If section not found, navigate to properties page
+        this.$router.push('/properties');
+      }
     }
   }
 }

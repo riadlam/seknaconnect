@@ -67,7 +67,6 @@ Nouveau projet
                   <th scope="col" class="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6">ID</th>
                   <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Nom</th>
                   <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Type de bien</th>
-                  <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Unités</th>
                   <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Date de livraison</th>
                   <th scope="col" class="relative py-3.5 pl-3 pr-4 sm:pr-6">
                     <span class="sr-only">Actions</span>
@@ -98,9 +97,6 @@ Nouveau projet
                     }">
                       {{ project.housing_type }}
                     </span>
-                  </td>
-                  <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                    {{ project.num_units }} {{ project.num_units === 1 ? 'unité' : 'unités' }}
                   </td>
                   <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
                     <div class="text-xs text-gray-400 mt-1">
@@ -147,7 +143,7 @@ Supprimer
                   </td>
                 </tr>
                 <tr v-if="projects.length === 0">
-                  <td colspan="6" class="px-6 py-4 text-center text-sm text-gray-500">
+                  <td colspan="5" class="px-6 py-4 text-center text-sm text-gray-500">
 Aucun projet trouvé.
                   </td>
                 </tr>

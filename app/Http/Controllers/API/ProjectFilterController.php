@@ -112,9 +112,14 @@ class ProjectFilterController extends Controller
     {
         // Validate input parameters
         $validated = $request->validate([
+            'search' => 'nullable|string|max:255',
             'housing_type' => 'nullable|string|max:100',
             'num_units_min' => 'nullable|integer|min:1',
             'num_units_max' => 'nullable|integer|min:1',
+            'bedrooms_min' => 'nullable|numeric|min:0',
+            'bedrooms_max' => 'nullable|numeric|min:0',
+            'bathrooms_min' => 'nullable|numeric|min:0',
+            'bathrooms_max' => 'nullable|numeric|min:0',
             'location' => 'nullable|string',
             'wilaya' => 'nullable|string',
             'commune' => 'nullable|string',
@@ -124,7 +129,15 @@ class ProjectFilterController extends Controller
             'price_min' => 'nullable|numeric|min:0',
             'price_max' => 'nullable|numeric|min:0',
             'surface_area_min' => 'nullable|numeric|min:0',
-            'surface_area_max' => 'nullable|numeric|min:0'
+            'surface_area_max' => 'nullable|numeric|min:0',
+            'f1_count_min' => 'nullable|integer|min:0',
+            'f1_count_max' => 'nullable|integer|min:0',
+            'f2_count_min' => 'nullable|integer|min:0',
+            'f2_count_max' => 'nullable|integer|min:0',
+            'f3_count_min' => 'nullable|integer|min:0',
+            'f3_count_max' => 'nullable|integer|min:0',
+            'f4_count_min' => 'nullable|integer|min:0',
+            'f4_count_max' => 'nullable|integer|min:0'
         ], [
             'delivery_date_min.before_or_equal' => 'Delivery date min must be before or equal to delivery date max',
             'delivery_date_max.after_or_equal' => 'Delivery date max must be after or equal to delivery date min'
@@ -135,6 +148,15 @@ class ProjectFilterController extends Controller
             ->whereHas('user', function($q) {
                 $q->where('is_verified', 1);
             });
+
+        // Apply search filter
+        if ($validated['search'] ?? null) {
+            $searchTerm = $validated['search'];
+            $query->where(function($q) use ($searchTerm) {
+                $q->where('name', 'like', "%{$searchTerm}%")
+                  ->orWhere('location', 'like', "%{$searchTerm}%");
+            });
+        }
 
         // Apply filters
         if ($validated['housing_type'] ?? null) {
@@ -188,6 +210,62 @@ class ProjectFilterController extends Controller
 
         if ($validated['surface_area_max'] ?? null) {
             $query->where('surface_area', '<=', $validated['surface_area_max']);
+        }
+
+        if ($validated['bedrooms_min'] ?? null) {
+            $query->where('bedrooms', '>=', $validated['bedrooms_min']);
+        }
+
+        if ($validated['bedrooms_max'] ?? null) {
+            $query->where('bedrooms', '<=', $validated['bedrooms_max']);
+        }
+
+        if ($validated['bathrooms_min'] ?? null) {
+            $query->where('bathrooms', '>=', $validated['bathrooms_min']);
+        }
+
+        if ($validated['bathrooms_max'] ?? null) {
+            $query->where('bathrooms', '<=', $validated['bathrooms_max']);
+        }
+
+        // Apply F1-F4 filters (for apartments)
+        // If any F type is selected, filter for projects that have at least 1 of any selected type (OR logic)
+        $hasF1Filter = isset($validated['f1_count_min']) && $validated['f1_count_min'] >= 1;
+        $hasF2Filter = isset($validated['f2_count_min']) && $validated['f2_count_min'] >= 1;
+        $hasF3Filter = isset($validated['f3_count_min']) && $validated['f3_count_min'] >= 1;
+        $hasF4Filter = isset($validated['f4_count_min']) && $validated['f4_count_min'] >= 1;
+        
+        if ($hasF1Filter || $hasF2Filter || $hasF3Filter || $hasF4Filter) {
+            $query->where(function($q) use ($hasF1Filter, $hasF2Filter, $hasF3Filter, $hasF4Filter) {
+                $first = true;
+                if ($hasF1Filter) {
+                    $q->where('f1_count', '>=', 1);
+                    $first = false;
+                }
+                if ($hasF2Filter) {
+                    if ($first) {
+                        $q->where('f2_count', '>=', 1);
+                        $first = false;
+                    } else {
+                        $q->orWhere('f2_count', '>=', 1);
+                    }
+                }
+                if ($hasF3Filter) {
+                    if ($first) {
+                        $q->where('f3_count', '>=', 1);
+                        $first = false;
+                    } else {
+                        $q->orWhere('f3_count', '>=', 1);
+                    }
+                }
+                if ($hasF4Filter) {
+                    if ($first) {
+                        $q->where('f4_count', '>=', 1);
+                    } else {
+                        $q->orWhere('f4_count', '>=', 1);
+                    }
+                }
+            });
         }
 
         // Execute query and get all results (no pagination)

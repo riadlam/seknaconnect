@@ -51,17 +51,70 @@
             <div class="mb-6">
               <h3 class="text-sm font-medium text-gray-700 mb-3">Type de bien</h3>
               <div class="space-y-2">
-                <div v-for="type in propertyTypes" :key="type.value" class="flex items-center">
-                  <input
-                    :id="`type-${type.value}`"
-                    v-model="filters.types"
-                    type="checkbox"
-                    :value="type.value"
-                    class="h-4 w-4 text-purple-600 focus:ring-purple-500 border-gray-300 rounded"
-                  >
-                  <label :for="`type-${type.value}`" class="ml-3 text-sm text-gray-700">
-                    {{ type.label }}
-                  </label>
+                <div v-for="type in propertyTypes" :key="type.value" class="flex flex-col">
+                  <div class="flex items-center">
+                    <input
+                      :id="`type-${type.value}`"
+                      v-model="filters.types"
+                      type="checkbox"
+                      :value="type.value"
+                      class="h-4 w-4 text-purple-600 focus:ring-purple-500 border-gray-300 rounded"
+                    >
+                    <label :for="`type-${type.value}`" class="ml-3 text-sm text-gray-700">
+                      {{ type.label }}
+                    </label>
+                  </div>
+                  <!-- Show F1-F4 checkboxes when Apartment is selected -->
+                  <div v-if="type.value === 'Apartment' && isApartmentSelected" class="ml-7 mt-2 space-y-2 pl-4 border-l-2 border-purple-200">
+                    <div class="flex items-center">
+                      <input
+                        id="filter-f1"
+                        v-model="filters.apartmentTypes"
+                        type="checkbox"
+                        value="f1"
+                        class="h-4 w-4 text-purple-600 focus:ring-purple-500 border-gray-300 rounded"
+                      >
+                      <label for="filter-f1" class="ml-3 text-sm text-gray-600">
+                        F1
+                      </label>
+                    </div>
+                    <div class="flex items-center">
+                      <input
+                        id="filter-f2"
+                        v-model="filters.apartmentTypes"
+                        type="checkbox"
+                        value="f2"
+                        class="h-4 w-4 text-purple-600 focus:ring-purple-500 border-gray-300 rounded"
+                      >
+                      <label for="filter-f2" class="ml-3 text-sm text-gray-600">
+                        F2
+                      </label>
+                    </div>
+                    <div class="flex items-center">
+                      <input
+                        id="filter-f3"
+                        v-model="filters.apartmentTypes"
+                        type="checkbox"
+                        value="f3"
+                        class="h-4 w-4 text-purple-600 focus:ring-purple-500 border-gray-300 rounded"
+                      >
+                      <label for="filter-f3" class="ml-3 text-sm text-gray-600">
+                        F3
+                      </label>
+                    </div>
+                    <div class="flex items-center">
+                      <input
+                        id="filter-f4"
+                        v-model="filters.apartmentTypes"
+                        type="checkbox"
+                        value="f4"
+                        class="h-4 w-4 text-purple-600 focus:ring-purple-500 border-gray-300 rounded"
+                      >
+                      <label for="filter-f4" class="ml-3 text-sm text-gray-600">
+                        F4
+                      </label>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -171,6 +224,68 @@
                     placeholder="Max"
                     class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 sm:text-sm"
                     :min="filters.minUnits || 0"
+                  >
+                </div>
+              </div>
+            </div>
+
+            <!-- Bedrooms Filter -->
+            <div class="mb-6">
+              <h3 class="text-sm font-medium text-gray-700 mb-3">Chambres</h3>
+              <div class="flex items-center gap-3">
+                <div class="flex-1">
+                  <label for="min-bedrooms" class="sr-only">Chambres min</label>
+                  <input
+                    type="number"
+                    id="min-bedrooms"
+                    v-model.number="filters.minBedrooms"
+                    placeholder="Min"
+                    class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 sm:text-sm"
+                    min="0"
+                  >
+                </div>
+                <div class="text-gray-500">-</div>
+                <div class="flex-1">
+                  <label for="max-bedrooms" class="sr-only">Chambres max</label>
+                  <input
+                    type="number"
+                    id="max-bedrooms"
+                    v-model.number="filters.maxBedrooms"
+                    placeholder="Max"
+                    class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 sm:text-sm"
+                    :min="filters.minBedrooms || 0"
+                  >
+                </div>
+              </div>
+            </div>
+
+            <!-- Bathrooms Filter -->
+            <div class="mb-6">
+              <h3 class="text-sm font-medium text-gray-700 mb-3">Salles de bain</h3>
+              <div class="flex items-center gap-3">
+                <div class="flex-1">
+                  <label for="min-bathrooms" class="sr-only">Salles de bain min</label>
+                  <input
+                    type="number"
+                    id="min-bathrooms"
+                    v-model.number="filters.minBathrooms"
+                    placeholder="Min"
+                    class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 sm:text-sm"
+                    min="0"
+                    step="0.5"
+                  >
+                </div>
+                <div class="text-gray-500">-</div>
+                <div class="flex-1">
+                  <label for="max-bathrooms" class="sr-only">Salles de bain max</label>
+                  <input
+                    type="number"
+                    id="max-bathrooms"
+                    v-model.number="filters.maxBathrooms"
+                    placeholder="Max"
+                    class="block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 sm:text-sm"
+                    :min="filters.minBathrooms || 0"
+                    step="0.5"
                   >
                 </div>
               </div>
@@ -371,20 +486,20 @@
                   <span class="line-clamp-1">{{ formatLocation(property.location) || 'Localisation non spécifiée' }}</span>
                 </p>
                 
-                <div class="mt-3 pt-3 border-t border-gray-100 flex items-center justify-between">
-                  <div class="flex items-center text-sm text-gray-500">
-                    <span class="flex items-center mr-4">
-                      <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <div class="mt-3 pt-3 border-t border-gray-100">
+                  <div class="grid grid-cols-2 gap-3 text-sm text-gray-500">
+                    <div class="flex items-center">
+                      <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
                       </svg>
-                      {{ property.surface_area || 'N/A' }} m²
-                    </span>
-                    <span class="flex items-center">
-                      <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <span>{{ property.surface_area ? `${property.surface_area} m²` : 'N/A' }}</span>
+                    </div>
+                    <div class="flex items-center">
+                      <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
                       </svg>
-                      {{ property.num_units || 'N/A' }} unités
-                    </span>
+                      <span>{{ property.num_units !== null && property.num_units !== undefined ? `${property.num_units} unité${property.num_units > 1 ? 's' : ''}` : 'N/A' }}</span>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -423,7 +538,7 @@ import axios from 'axios';
 
 // Create axios instance for direct API calls
 const axiosInstance = axios.create({
-  baseURL: 'http://192.168.1.15:8000',
+  baseURL: 'http://172.16.12.249:8000',
   headers: {
     'Accept': 'application/json',
     'Content-Type': 'application/json',
@@ -454,11 +569,34 @@ const filters = ref({
   maxArea: null,
   minUnits: null,
   maxUnits: null,
+  minBedrooms: null,
+  maxBedrooms: null,
+  minBathrooms: null,
+  maxBathrooms: null,
   deliveryStartDate: '',
   deliveryEndDate: '',
   wilaya: '',
   baladia: '',
-  daira: ''
+  daira: '',
+  apartmentTypes: [] // Array of selected F types: ['f1', 'f2', 'f3', 'f4']
+});
+
+// Check if Apartment is selected
+const isApartmentSelected = computed(() => {
+  if (!filters.value.types || filters.value.types.length === 0) {
+    return false;
+  }
+  return filters.value.types.includes('Apartment');
+});
+
+// Watch for apartment deselection to clear F filters
+watch(() => filters.value.types, (newTypes) => {
+  const hasApartment = newTypes.includes('Apartment');
+  
+  // Clear apartment types if apartment is deselected
+  if (!hasApartment && filters.value.apartmentTypes.length > 0) {
+    filters.value.apartmentTypes = [];
+  }
 });
 
 // Location data
@@ -620,18 +758,18 @@ watch(locationError, (newError) => {
 
 // Types de biens
 const propertyTypes = [
-  { value: 'house', label: 'Maison' },
-  { value: 'apartment', label: 'Appartement' },
-  { value: 'villa', label: 'Villa' },
-  { value: 'condo', label: 'Condominium' },
-  { value: 'townhouse', label: 'Maison de ville' },
-  { value: 'penthouse', label: 'Penthouse' },
-  { value: 'cabin', label: 'Chalet' },
-  { value: 'mansion', label: 'Manoir' },
-  { value: 'loft', label: 'Loft' },
-  { value: 'farmhouse', label: 'Ferme' },
-  { value: 'brownstone', label: 'Immeuble en pierre' },
-  { value: 'cottage', label: 'Cottage' }
+  { value: 'House', label: 'Maison' },
+  { value: 'Apartment', label: 'Appartement' },
+  { value: 'Villa', label: 'Villa' },
+  { value: 'Townhouse', label: 'Maison de ville' },
+  { value: 'Penthouse', label: 'Penthouse' },
+  { value: 'Duplex', label: 'Duplex' },
+  { value: 'Cabin', label: 'Chalet' },
+  { value: 'Mansion', label: 'Manoir' },
+  { value: 'Loft', label: 'Loft' },
+  { value: 'Farmhouse', label: 'Ferme' },
+  { value: 'Brownstone', label: 'Immeuble en pierre' },
+  { value: 'Cottage', label: 'Cottage' }
 ];
 
 // Options de chambres
@@ -668,6 +806,29 @@ const features = [
   { value: 'balcony', label: 'Balcon' }
 ];
 
+// Helper function to get price from payment plan or regular price field
+const getProjectPrice = (project) => {
+  // First, check payment plan for cash or bank amount
+  if (project.payment_plan) {
+    try {
+      const paymentPlanData = typeof project.payment_plan === 'string' 
+        ? JSON.parse(project.payment_plan) 
+        : project.payment_plan;
+      
+      if (paymentPlanData.paymentMethod === 'cash' && paymentPlanData.cashAmount) {
+        return paymentPlanData.cashAmount;
+      } else if (paymentPlanData.paymentMethod === 'bank' && paymentPlanData.bankFullAmount) {
+        return paymentPlanData.bankFullAmount;
+      }
+    } catch (e) {
+      console.warn('Could not parse payment plan:', e);
+    }
+  }
+  
+  // Fall back to regular price field
+  return project.price || null;
+};
+
 // Fetch properties from API
 const fetchProperties = async () => {
   try {
@@ -683,6 +844,7 @@ const fetchProperties = async () => {
     const params = {
       page: currentPage.value,
       per_page: perPage,
+      ...(filters.value.search && { search: filters.value.search }),
       ...(filters.value.wilaya && { wilaya: filters.value.wilaya }),
       ...(filters.value.baladia && { commune: filters.value.baladia }),
       ...(filters.value.daira && { daira: filters.value.daira }),
@@ -690,7 +852,20 @@ const fetchProperties = async () => {
       ...(filters.value.maxPrice && { price_max: filters.value.maxPrice }),
       ...(filters.value.minArea && { surface_area_min: filters.value.minArea }),
       ...(filters.value.maxArea && { surface_area_max: filters.value.maxArea }),
-      ...(filters.value.types && filters.value.types.length > 0 && { housing_type: filters.value.types.join(',') })
+      ...(filters.value.minUnits && { num_units_min: filters.value.minUnits }),
+      ...(filters.value.maxUnits && { num_units_max: filters.value.maxUnits }),
+      ...(filters.value.minBedrooms && { bedrooms_min: filters.value.minBedrooms }),
+      ...(filters.value.maxBedrooms && { bedrooms_max: filters.value.maxBedrooms }),
+      ...(filters.value.minBathrooms && { bathrooms_min: filters.value.minBathrooms }),
+      ...(filters.value.maxBathrooms && { bathrooms_max: filters.value.maxBathrooms }),
+      ...(filters.value.deliveryStartDate && { delivery_date_min: filters.value.deliveryStartDate }),
+      ...(filters.value.deliveryEndDate && { delivery_date_max: filters.value.deliveryEndDate }),
+      ...(filters.value.types && filters.value.types.length > 0 && { housing_type: filters.value.types.join(',') }),
+      // Add F1-F4 filters if apartment types are selected
+      ...(filters.value.apartmentTypes && filters.value.apartmentTypes.includes('f1') && { f1_count_min: 1 }),
+      ...(filters.value.apartmentTypes && filters.value.apartmentTypes.includes('f2') && { f2_count_min: 1 }),
+      ...(filters.value.apartmentTypes && filters.value.apartmentTypes.includes('f3') && { f3_count_min: 1 }),
+      ...(filters.value.apartmentTypes && filters.value.apartmentTypes.includes('f4') && { f4_count_min: 1 })
     };
     
     // Make API call to fetch projects with filters
@@ -702,28 +877,36 @@ const fetchProperties = async () => {
     });
     
     // Transform API response to match our component's expected format
-    const formattedData = response.data.projects.map(project => ({
-      id: project.id,
-      name: project.name,
-      location: project.location,
-      price: parseFloat(project.price),
-      featured: false, // You might want to add this to your API or handle it differently
-      bedrooms: 0, // Add these fields to your API or handle them appropriately
-      bathrooms: 0, // Add these fields to your API or handle them appropriately
-      surface_area: project.surface_area,
-      housing_type: project.housing_type,
-      images: project.images.map(img => ({
-        id: img.id,
-        url: img.image_path.startsWith('http') ? img.image_path : `http://192.168.1.15:8000${img.image_path}`,
-        image_path: img.image_path,
-        caption: img.caption
-      })),
-      created_at: project.created_at,
-      updated_at: project.updated_at,
-      num_units: project.num_units,
-      delivery_date: project.delivery_date,
-      description: project.description
-    }));
+    const formattedData = response.data.projects.map(project => {
+      const projectPrice = getProjectPrice(project);
+      return {
+        id: project.id,
+        name: project.name,
+        location: project.location,
+        price: projectPrice, // Use extracted price from payment plan or regular price
+        payment_plan: project.payment_plan, // Keep for reference
+        featured: false, // You might want to add this to your API or handle it differently
+        bedrooms: project.bedrooms || 0,
+        bathrooms: project.bathrooms || 0,
+        surface_area: project.surface_area,
+        housing_type: project.housing_type,
+        images: (project.images || []).map(img => ({
+          id: img.id,
+          url: img.image_path && img.image_path.startsWith('http') ? img.image_path : `http://172.16.12.249:8000${img.image_path}`,
+          image_path: img.image_path,
+          caption: img.caption
+        })),
+        created_at: project.created_at,
+        updated_at: project.updated_at,
+        num_units: project.num_units || null,
+        delivery_date: project.delivery_date,
+        description: project.description,
+        f1_count: project.f1_count || 0,
+        f2_count: project.f2_count || 0,
+        f3_count: project.f3_count || 0,
+        f4_count: project.f4_count || 0
+      };
+    });
     
     // Update component state with API data
     properties.value = formattedData;
@@ -773,13 +956,15 @@ const formatLocation = computed(() => (location) => {
 
 // Formater le prix
 const formatPrice = (price) => {
-  if (!price) return 'Prix sur demande';
+  if (!price && price !== 0) return 'Prix sur demande';
+  const numericValue = Number(price);
+  if (isNaN(numericValue)) return 'Prix sur demande';
   return new Intl.NumberFormat('fr-DZ', {
     style: 'currency',
     currency: 'DZD',
     minimumFractionDigits: 0,
     maximumFractionDigits: 0
-  }).format(price).replace('DZD', 'DA');
+  }).format(numericValue).replace('DZD', 'DA');
 };
 
 // Get first image URL from property
@@ -789,75 +974,9 @@ const getFirstImage = (property) => {
   return firstImage.image_path || firstImage.url || '';
 };
 
-// Filtered properties
+// Since we're doing server-side filtering, we don't need client-side filtering
 const filteredProperties = computed(() => {
-  return properties.value.filter(property => {
-    // Number of units filter
-    if (filters.value.minUnits !== null && (property.num_units || 0) < filters.value.minUnits) {
-      return false;
-    }
-    if (filters.value.maxUnits !== null && (property.num_units || 0) > filters.value.maxUnits) {
-      return false;
-    }
-
-    // Surface area filter
-    if (filters.value.minArea !== null && (property.surface_area || 0) < filters.value.minArea) {
-      return false;
-    }
-    if (filters.value.maxArea !== null && (property.surface_area || 0) > filters.value.maxArea) {
-      return false;
-    }
-
-    // Delivery date filter
-    if (filters.value.deliveryStartDate && property.delivery_date) {
-      const deliveryDate = new Date(property.delivery_date);
-      const startDate = new Date(filters.value.deliveryStartDate);
-      if (deliveryDate < startDate) {
-        return false;
-      }
-    }
-    if (filters.value.deliveryEndDate && property.delivery_date) {
-      const deliveryDate = new Date(property.delivery_date);
-      const endDate = new Date(filters.value.deliveryEndDate);
-      endDate.setHours(23, 59, 59, 999); // Include the entire end day
-      if (deliveryDate > endDate) {
-        return false;
-      }
-    }
-
-    // Search filter
-    if (filters.value.search) {
-      const searchTerm = filters.value.search.toLowerCase();
-      const nameMatch = property.name?.toLowerCase().includes(searchTerm) || false;
-      const locationMatch = property.location?.toLowerCase().includes(searchTerm) || false;
-      if (!nameMatch && !locationMatch) return false;
-    }
-
-    // Type filter
-    if (filters.value.types.length > 0 && !filters.value.types.includes(property.housing_type)) {
-      return false;
-    }
-
-    // Price range filter
-    if (filters.value.minPrice !== null && property.price < filters.value.minPrice) {
-      return false;
-    }
-    if (filters.value.maxPrice !== null && property.price > filters.value.maxPrice) {
-      return false;
-    }
-
-    // Bedrooms filter
-    if (filters.value.bedrooms !== null && property.bedrooms < filters.value.bedrooms) {
-      return false;
-    }
-
-    // Bathrooms filter
-    if (filters.value.bathrooms !== null && property.bathrooms < filters.value.bathrooms) {
-      return false;
-    }
-
-    return true;
-  });
+  return properties.value;
 });
 
 // Sorted properties
@@ -900,13 +1019,18 @@ const resetFilters = () => {
     maxArea: null,
     minUnits: null,
     maxUnits: null,
+    minBedrooms: null,
+    maxBedrooms: null,
+    minBathrooms: null,
+    maxBathrooms: null,
     deliveryStartDate: '',
     deliveryEndDate: '',
     wilaya: '',
     baladia: '',
     daira: '',
     baladias: [],
-    dairas: []
+    dairas: [],
+    apartmentTypes: []
   };
   
   // Reset sort option

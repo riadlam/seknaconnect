@@ -9,11 +9,21 @@ class Project {
     delivery_date,
     price,
     surface_area,
+    bedrooms,
+    bathrooms,
+    rent_or_buy,
+    payment_plan,
+    project_timeline,
     description,
     created_at,
     updated_at,
     images = [],
-    user = {}
+    user = {},
+    f1_count,
+    f2_count,
+    f3_count,
+    f4_count,
+    additional_housing_types
   } = {}) {
     this.id = id;
     this.userId = user_id;
@@ -24,17 +34,34 @@ class Project {
     this.deliveryDate = delivery_date;
     this.price = parseFloat(price) || 0;
     this.surfaceArea = surface_area;
+    this.bedrooms = bedrooms;
+    this.bathrooms = bathrooms;
+    this.rentOrBuy = rent_or_buy;
+    this.paymentPlan = payment_plan;
+    this.projectTimeline = project_timeline;
     this.description = description;
     this.createdAt = created_at;
     this.updatedAt = updated_at;
     this.images = images.map(img => ({
       id: img.id,
       path: img.image_path,
-      url: `http://192.168.1.15:8000${img.image_path}`,
+      url: `http://172.16.12.249:8000${img.image_path}`,
       alt: `Property image ${img.id}`
     }));
     this.user = user;
     this.featured = false; // Will be set based on business logic
+    this.f1Count = f1_count || 0;
+    this.f2Count = f2_count || 0;
+    this.f3Count = f3_count || 0;
+    this.f4Count = f4_count || 0;
+    // Parse additional_housing_types if it's a JSON string
+    try {
+      this.additionalHousingTypes = typeof additional_housing_types === 'string' 
+        ? JSON.parse(additional_housing_types) 
+        : (additional_housing_types || []);
+    } catch (e) {
+      this.additionalHousingTypes = Array.isArray(additional_housing_types) ? additional_housing_types : [];
+    }
   }
 
   // Helper methods

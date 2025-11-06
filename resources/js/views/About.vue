@@ -101,68 +101,6 @@
       </div>
     </div>
 
-    <!-- Team Section -->
-    <div class="py-16 bg-white">
-      <div class="container mx-auto px-4">
-        <div class="text-center mb-16">
-          <h2 class="text-3xl font-bold text-gray-900 mb-4">Rencontrez Notre Équipe de Direction</h2>
-          <p class="text-xl text-gray-600 max-w-3xl mx-auto">
-            Les passionnés qui font avancer SeknaConnect
-          </p>
-        </div>
-        
-        <div class="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
-          <!-- Team Member 1 -->
-          <div class="text-center">
-            <div class="w-48 h-48 mx-auto mb-6 rounded-full overflow-hidden border-4 border-white shadow-xl">
-              <img 
-                src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=774&q=80" 
-                alt="Sarah Johnson"
-                class="w-full h-full object-cover"
-              >
-            </div>
-            <h3 class="text-xl font-semibold text-gray-900">Sarah Johnson</h3>
-            <p class="text-purple-600 font-medium mb-2">CEO & Founder</p>
-            <p class="text-gray-600 text-sm max-w-xs mx-auto">
-              Avec plus de 15 ans d'expérience dans l'immobilier, Sarah a fondé SeknaConnect pour révolutionner le secteur.
-            </p>
-          </div>
-          
-          <!-- Team Member 2 -->
-          <div class="text-center">
-            <div class="w-48 h-48 mx-auto mb-6 rounded-full overflow-hidden border-4 border-white shadow-xl">
-              <img 
-                src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=774&q=80" 
-                alt="Michael Chen"
-                class="w-full h-full object-cover"
-              >
-            </div>
-            <h3 class="text-xl font-semibold text-gray-900">Michael Chen</h3>
-            <p class="text-purple-600 font-medium mb-2">CTO</p>
-            <p class="text-gray-600 text-sm max-w-xs mx-auto">
-              Visionnaire technologique passionné par la création d'expériences numériques fluides dans l'immobilier.
-            </p>
-          </div>
-          
-          <!-- Team Member 3 -->
-          <div class="text-center">
-            <div class="w-48 h-48 mx-auto mb-6 rounded-full overflow-hidden border-4 border-white shadow-xl">
-              <img 
-                src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=870&q=80" 
-                alt="Emily Rodriguez"
-                class="w-full h-full object-cover"
-              >
-            </div>
-            <h3 class="text-xl font-semibold text-gray-900">Emily Rodriguez</h3>
-            <p class="text-purple-600 font-medium mb-2">Head of Customer Success</p>
-            <p class="text-gray-600 text-sm max-w-xs mx-auto">
-              Dédiée à garantir à chaque client une expérience exceptionnelle avec SeknaConnect.
-            </p>
-          </div>
-        </div>
-      </div>
-    </div>
-
     <!-- CTA Section -->
     <div class="bg-gradient-to-r from-purple-600 to-indigo-700 text-white py-16">
       <div class="container mx-auto px-4 text-center">

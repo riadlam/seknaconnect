@@ -199,23 +199,110 @@ class ProjectController extends Controller
      */
     public function store(Request $request)
     {
+        // Prepare request data: convert empty strings to null for nullable fields
+        $requestData = $request->all();
+        $nullableFields = ['price', 'surface_area', 'bedrooms', 'bathrooms', 'rent_or_buy', 'delivery_date', 
+                          'description', 'payment_plan', 'project_timeline', 'additional_housing_types',
+                          'f1_count', 'f2_count', 'f3_count', 'f4_count', 'num_units'];
+        
+        foreach ($nullableFields as $field) {
+            if (isset($requestData[$field]) && $requestData[$field] === '') {
+                $requestData[$field] = null;
+            }
+        }
+        
+        // Merge cleaned data back into request
+        $request->merge($requestData);
+        
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'housing_type' => 'required|string|max:100',
-            'num_units' => 'required|integer|min:1',
             'location' => 'required|array',
             'location.wilaya' => 'required|string|max:255',
             'location.commune' => 'required|string|max:255',
             'location.daira' => 'required|string|max:255',
-            'delivery_date' => 'required|date|after:today',
-            'price' => 'required|numeric|min:0',
-            'surface_area' => 'required|numeric|min:0',
+            'delivery_date' => 'nullable|date',
+            'price' => 'nullable|numeric|min:0',
+            'surface_area' => 'nullable|numeric|min:0',
+            'bedrooms' => 'nullable|string|max:50',
+            'bathrooms' => 'nullable|numeric|min:0',
+            'rent_or_buy' => 'nullable|in:rent,buy',
+            'payment_plan' => 'nullable|string',
+            'project_timeline' => 'nullable|string',
             'description' => 'nullable|string',
+            'additional_housing_types' => 'nullable|string',
+            'f1_count' => 'nullable|integer|min:0',
+            'f2_count' => 'nullable|integer|min:0',
+            'f3_count' => 'nullable|integer|min:0',
+            'f4_count' => 'nullable|integer|min:0',
+            'num_units' => 'nullable|integer|min:0',
             'images' => 'nullable|array',
             'images.*' => 'image|mimes:jpeg,png,jpg,gif,svg|max:5120', // Max 5MB per image
             'captions' => 'nullable|array',
             'captions.*' => 'nullable|string|max:255'
         ]);
+
+        // Validate and process payment plan
+        if (isset($validated['payment_plan']) && !empty($validated['payment_plan'])) {
+            $paymentPlanData = json_decode($validated['payment_plan'], true);
+            
+            if (json_last_error() !== JSON_ERROR_NONE) {
+                return response()->json([
+                    'message' => 'Invalid payment plan JSON format'
+                ], 422);
+            }
+
+            // Validate payment plan structure
+            if (!isset($paymentPlanData['paymentMethod']) || !in_array($paymentPlanData['paymentMethod'], ['cash', 'bank'])) {
+                return response()->json([
+                    'message' => 'Payment method must be either "cash" or "bank"'
+                ], 422);
+            }
+
+            // Validate based on payment method
+            if ($paymentPlanData['paymentMethod'] === 'cash') {
+                if (!isset($paymentPlanData['cashAmount']) || !is_numeric($paymentPlanData['cashAmount']) || $paymentPlanData['cashAmount'] < 0) {
+                    return response()->json([
+                        'message' => 'Cash amount is required and must be a positive number'
+                    ], 422);
+                }
+            } elseif ($paymentPlanData['paymentMethod'] === 'bank') {
+                if (!isset($paymentPlanData['bankFullAmount']) || !is_numeric($paymentPlanData['bankFullAmount']) || $paymentPlanData['bankFullAmount'] < 0) {
+                    return response()->json([
+                        'message' => 'Bank full amount is required and must be a positive number'
+                    ], 422);
+                }
+                if (!isset($paymentPlanData['bankDownPayment']) || !is_numeric($paymentPlanData['bankDownPayment']) || $paymentPlanData['bankDownPayment'] < 0) {
+                    return response()->json([
+                        'message' => 'Bank down payment is required and must be a positive number'
+                    ], 422);
+                }
+            }
+
+            // Store as JSON string (will be cast to array by model)
+            $validated['payment_plan'] = json_encode($paymentPlanData);
+        }
+
+        // Process additional_housing_types if provided
+        if (isset($validated['additional_housing_types']) && !empty($validated['additional_housing_types'])) {
+            $additionalTypes = json_decode($validated['additional_housing_types'], true);
+            if (json_last_error() === JSON_ERROR_NONE && is_array($additionalTypes)) {
+                // Filter out empty values - handle both old format (strings) and new format (objects)
+                $filtered = array_filter($additionalTypes, function($item) {
+                    if (is_string($item)) {
+                        return !empty($item);
+                    }
+                    if (is_array($item) || is_object($item)) {
+                        $item = (array)$item;
+                        return !empty($item['type']);
+                    }
+                    return false;
+                });
+                $validated['additional_housing_types'] = json_encode(array_values($filtered)); // Re-index array
+            } else {
+                unset($validated['additional_housing_types']);
+            }
+        }
 
         // Convert location array to JSON string for storage
         $validated['location'] = json_encode($validated['location']);
@@ -307,19 +394,110 @@ class ProjectController extends Controller
     {
         $project = $request->user()->projects()->findOrFail($id);
 
+        // Prepare request data: convert empty strings to null for nullable fields
+        $requestData = $request->all();
+        $nullableFields = ['price', 'surface_area', 'bedrooms', 'bathrooms', 'rent_or_buy', 'delivery_date', 
+                          'description', 'payment_plan', 'project_timeline', 'additional_housing_types',
+                          'f1_count', 'f2_count', 'f3_count', 'f4_count', 'num_units'];
+        
+        foreach ($nullableFields as $field) {
+            if (isset($requestData[$field]) && $requestData[$field] === '') {
+                $requestData[$field] = null;
+            }
+        }
+        
+        // Merge cleaned data back into request
+        $request->merge($requestData);
+
         $validated = $request->validate([
             'name' => 'sometimes|required|string|max:255',
             'housing_type' => 'sometimes|required|string|max:100',
-            'num_units' => 'sometimes|required|integer|min:1',
             'location' => 'sometimes|required|array',
             'location.wilaya' => 'required_with:location|string|max:255',
             'location.commune' => 'required_with:location|string|max:255',
             'location.daira' => 'required_with:location|string|max:255',
-            'delivery_date' => 'sometimes|required|date|after:today',
-            'price' => 'sometimes|required|numeric|min:0',
-            'surface_area' => 'sometimes|required|numeric|min:0',
-            'description' => 'nullable|string'
+            'delivery_date' => 'nullable|date',
+            'price' => 'nullable|numeric|min:0',
+            'surface_area' => 'nullable|numeric|min:0',
+            'bedrooms' => 'nullable|string|max:50',
+            'bathrooms' => 'nullable|numeric|min:0',
+            'rent_or_buy' => 'nullable|in:rent,buy',
+            'payment_plan' => 'nullable|string',
+            'project_timeline' => 'nullable|string',
+            'description' => 'nullable|string',
+            'additional_housing_types' => 'nullable|string',
+            'f1_count' => 'nullable|integer|min:0',
+            'f2_count' => 'nullable|integer|min:0',
+            'f3_count' => 'nullable|integer|min:0',
+            'f4_count' => 'nullable|integer|min:0',
+            'num_units' => 'nullable|integer|min:0',
+            'images' => 'nullable|array',
+            'images.*' => 'image|mimes:jpeg,png,jpg,gif,svg|max:5120', // Max 5MB per image
+            'captions' => 'nullable|array',
+            'captions.*' => 'nullable|string|max:255'
         ]);
+
+        // Validate and process payment plan
+        if (isset($validated['payment_plan']) && !empty($validated['payment_plan'])) {
+            $paymentPlanData = json_decode($validated['payment_plan'], true);
+            
+            if (json_last_error() !== JSON_ERROR_NONE) {
+                return response()->json([
+                    'message' => 'Invalid payment plan JSON format'
+                ], 422);
+            }
+
+            // Validate payment plan structure
+            if (!isset($paymentPlanData['paymentMethod']) || !in_array($paymentPlanData['paymentMethod'], ['cash', 'bank'])) {
+                return response()->json([
+                    'message' => 'Payment method must be either "cash" or "bank"'
+                ], 422);
+            }
+
+            // Validate based on payment method
+            if ($paymentPlanData['paymentMethod'] === 'cash') {
+                if (!isset($paymentPlanData['cashAmount']) || !is_numeric($paymentPlanData['cashAmount']) || $paymentPlanData['cashAmount'] < 0) {
+                    return response()->json([
+                        'message' => 'Cash amount is required and must be a positive number'
+                    ], 422);
+                }
+            } elseif ($paymentPlanData['paymentMethod'] === 'bank') {
+                if (!isset($paymentPlanData['bankFullAmount']) || !is_numeric($paymentPlanData['bankFullAmount']) || $paymentPlanData['bankFullAmount'] < 0) {
+                    return response()->json([
+                        'message' => 'Bank full amount is required and must be a positive number'
+                    ], 422);
+                }
+                if (!isset($paymentPlanData['bankDownPayment']) || !is_numeric($paymentPlanData['bankDownPayment']) || $paymentPlanData['bankDownPayment'] < 0) {
+                    return response()->json([
+                        'message' => 'Bank down payment is required and must be a positive number'
+                    ], 422);
+                }
+            }
+
+            // Store as JSON string (will be cast to array by model)
+            $validated['payment_plan'] = json_encode($paymentPlanData);
+        }
+
+        // Process additional_housing_types if provided
+        if (isset($validated['additional_housing_types']) && !empty($validated['additional_housing_types'])) {
+            $additionalTypes = json_decode($validated['additional_housing_types'], true);
+            if (json_last_error() === JSON_ERROR_NONE && is_array($additionalTypes)) {
+                // Filter out empty values - handle both old format (strings) and new format (objects)
+                $filtered = array_filter($additionalTypes, function($item) {
+                    if (is_string($item)) {
+                        return !empty($item);
+                    }
+                    if (is_array($item) || is_object($item)) {
+                        $item = (array)$item;
+                        return !empty($item['type']);
+                    }
+                    return false;
+                });
+                $validated['additional_housing_types'] = json_encode(array_values($filtered)); // Re-index array
+            } else {
+                unset($validated['additional_housing_types']);
+            }
+        }
 
         // Convert location array to JSON string if present
         if (isset($validated['location'])) {
@@ -327,6 +505,34 @@ class ProjectController extends Controller
         }
 
         $project->update($validated);
+
+        // Handle image uploads if any new images are provided
+        if ($request->hasFile('images')) {
+            foreach ($request->file('images') as $index => $image) {
+                // Generate a unique filename with timestamp
+                $filename = uniqid() . '.' . $image->getClientOriginalExtension();
+                
+                // Store the file directly in public/storage/project-images
+                $publicPath = public_path('storage/project-images');
+                if (!file_exists($publicPath)) {
+                    mkdir($publicPath, 0777, true);
+                }
+                $image->move($publicPath, $filename);
+                
+                // Get caption if provided
+                $caption = isset($validated['captions'][$index]) 
+                    ? $validated['captions'][$index] 
+                    : null;
+                
+                // Create new image record
+                $project->images()->create([
+                    'image_path' => '/storage/project-images/' . $filename,
+                    'caption' => $caption
+                ]);
+            }
+        }
+
+        // Load the images relationship for the response
         $project->load(['images', 'user']);
 
         return response()->json($project);

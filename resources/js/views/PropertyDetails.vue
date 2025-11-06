@@ -40,36 +40,95 @@
             </button>
           </div>
   
-          <!-- Main Image -->
-          <div class="relative h-96 w-full bg-gray-200 overflow-hidden">
-            <img 
-              v-if="currentImage"
-              :src="currentImage" 
-              :alt="property.title"
-              class="w-full h-full object-cover transition-opacity duration-500"
-              :class="{'opacity-0': !imageLoaded}"
-              @load="onImageLoad"
-            >
-            <div v-else class="w-full h-full bg-gray-200 flex items-center justify-center">
-              <span class="text-gray-400">Aucune image disponible</span>
+          <!-- Main Image Gallery -->
+          <div class="relative w-full bg-gray-200 overflow-hidden">
+            <!-- Main Image Display -->
+            <div class="relative h-[500px] md:h-[600px] lg:h-[700px] w-full bg-gray-200 overflow-hidden group">
+              <img 
+                v-if="currentImage"
+                :src="currentImage" 
+                :alt="property.name || 'Property image'"
+                class="w-full h-full object-cover transition-all duration-700 ease-in-out"
+                :class="{'opacity-0 scale-105': !imageLoaded}"
+                @load="onImageLoad"
+                @click="openLightbox(currentImageIndex)"
+              >
+              <div v-else class="w-full h-full bg-gray-200 flex items-center justify-center">
+                <span class="text-gray-400 text-lg">Aucune image disponible</span>
+              </div>
+              <div v-if="!imageLoaded" class="absolute inset-0 bg-gray-200 animate-pulse"></div>
+              
+              <!-- Image Counter -->
+              <div v-if="property.images && property.images.length > 0" class="absolute top-4 right-4 bg-black/60 backdrop-blur-sm text-white px-4 py-2 rounded-full text-sm font-medium">
+                {{ currentImageIndex + 1 }} / {{ property.images.length }}
+              </div>
+              
+              <!-- Navigation Arrows -->
+              <button
+                v-if="property.images && property.images.length > 1"
+                @click.stop="previousImage"
+                class="absolute left-4 top-1/2 -translate-y-1/2 bg-white/90 backdrop-blur-sm p-3 rounded-full shadow-lg hover:bg-white transition-all duration-200 opacity-0 group-hover:opacity-100 focus:opacity-100 z-10"
+                aria-label="Previous image"
+              >
+                <svg class="w-6 h-6 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+                </svg>
+              </button>
+              <button
+                v-if="property.images && property.images.length > 1"
+                @click.stop="nextImage"
+                class="absolute right-4 top-1/2 -translate-y-1/2 bg-white/90 backdrop-blur-sm p-3 rounded-full shadow-lg hover:bg-white transition-all duration-200 opacity-0 group-hover:opacity-100 focus:opacity-100 z-10"
+                aria-label="Next image"
+              >
+                <svg class="w-6 h-6 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                </svg>
+              </button>
+              
+              <!-- Fullscreen Button -->
+              <button
+                v-if="property.images && property.images.length > 0"
+                @click.stop="openLightbox(currentImageIndex)"
+                class="absolute bottom-4 right-4 bg-white/90 backdrop-blur-sm p-3 rounded-full shadow-lg hover:bg-white transition-all duration-200 opacity-0 group-hover:opacity-100 focus:opacity-100 z-10"
+                aria-label="View fullscreen"
+              >
+                <svg class="w-6 h-6 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" />
+                </svg>
+              </button>
             </div>
-            <div v-if="!imageLoaded" class="absolute inset-0 bg-gray-200 animate-pulse"></div>
-          </div>
-  
-          <!-- Image Thumbnails -->
-          <div class="flex px-4 py-3 space-x-2 overflow-x-auto bg-white border-t border-gray-100">
-            <button 
-              v-for="(img, index) in property.images.slice(0, 5)" 
-              :key="index"
-              @click="setCurrentImage(img)"
-              class="flex-shrink-0 w-16 h-16 rounded-md overflow-hidden border-2 transition-all duration-200"
-              :class="{
-                'border-purple-600 ring-2 ring-purple-400': currentImage === getImageUrl(img),
-                'border-transparent hover:border-gray-300': currentImage !== getImageUrl(img)
-              }"
-            >
-              <img :src="getImageUrl(img)" class="w-full h-full object-cover" :alt="'Property image ' + (index + 1)">
-            </button>
+
+            <!-- Image Thumbnails Grid -->
+            <div v-if="property.images && property.images.length > 0" class="bg-white border-t border-gray-200 p-4">
+              <div class="flex items-center justify-between mb-3">
+                <h3 class="text-sm font-semibold text-gray-700">Toutes les images ({{ property.images.length }})</h3>
+                <button
+                  @click="openLightbox(currentImageIndex)"
+                  class="text-sm text-purple-600 hover:text-purple-700 font-medium"
+                >
+                  Voir toutes les images
+                </button>
+              </div>
+              <div class="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-2">
+                <button
+                  v-for="(img, index) in property.images" 
+                  :key="index"
+                  @click="setCurrentImage(img, index)"
+                  class="relative aspect-square rounded-lg overflow-hidden border-2 transition-all duration-200 group"
+                  :class="{
+                    'border-purple-600 ring-2 ring-purple-400 shadow-md': currentImageIndex === index,
+                    'border-gray-200 hover:border-purple-400': currentImageIndex !== index
+                  }"
+                >
+                  <img 
+                    :src="getImageUrl(img)" 
+                    class="w-full h-full object-cover transition-transform duration-200 group-hover:scale-110" 
+                    :alt="`Property image ${index + 1}`"
+                  >
+                  <div v-if="currentImageIndex === index" class="absolute inset-0 bg-purple-600/20"></div>
+                </button>
+              </div>
+            </div>
           </div>
         </div>
   
@@ -98,29 +157,258 @@
               <div class="py-6 border-b border-gray-200">
                 <h2 class="text-lg font-medium text-gray-900 mb-4">Détails du bien</h2>
                 <div class="grid grid-cols-2 gap-4">
+                  <!-- Housing Type -->
                   <div class="flex items-center">
                     <svg class="h-5 w-5 text-green-500 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
                     </svg>
                     <span class="text-gray-600">{{ property.housingType || 'Non spécifié' }}</span>
                   </div>
+                  
+                  <!-- Surface Area -->
                   <div class="flex items-center">
                     <svg class="h-5 w-5 text-green-500 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
                     </svg>
                     <span class="text-gray-600">{{ property.surfaceArea }} m²</span>
                   </div>
+                  
+                  <!-- F1-F4 Counts (only show if housing type is Apartment) -->
+                  <template v-if="property.housingType === 'Apartment'">
+                    <div v-if="property.f1Count > 0" class="flex items-center">
+                      <svg class="h-5 w-5 text-purple-500 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                      </svg>
+                      <span class="text-gray-600">F1: {{ property.f1Count }} unité{{ property.f1Count > 1 ? 's' : '' }}</span>
+                    </div>
+                    <div v-if="property.f2Count > 0" class="flex items-center">
+                      <svg class="h-5 w-5 text-purple-500 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                      </svg>
+                      <span class="text-gray-600">F2: {{ property.f2Count }} unité{{ property.f2Count > 1 ? 's' : '' }}</span>
+                    </div>
+                    <div v-if="property.f3Count > 0" class="flex items-center">
+                      <svg class="h-5 w-5 text-purple-500 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                      </svg>
+                      <span class="text-gray-600">F3: {{ property.f3Count }} unité{{ property.f3Count > 1 ? 's' : '' }}</span>
+                    </div>
+                    <div v-if="property.f4Count > 0" class="flex items-center">
+                      <svg class="h-5 w-5 text-purple-500 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                      </svg>
+                      <span class="text-gray-600">F4: {{ property.f4Count }} unité{{ property.f4Count > 1 ? 's' : '' }}</span>
+                    </div>
+                  </template>
+                  
+                  <!-- Number of Units for non-Apartment types -->
+                  <div v-if="property.housingType && property.housingType !== 'Apartment' && property.numUnits" class="flex items-center">
+                    <svg class="h-5 w-5 text-purple-500 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                    </svg>
+                    <span class="text-gray-600">{{ property.numUnits }} unité{{ property.numUnits > 1 ? 's' : '' }}</span>
+                  </div>
+                  
+                  <!-- Additional Housing Types -->
+                  <template v-if="property.additionalHousingTypes && property.additionalHousingTypes.length > 0">
+                    <div 
+                      v-for="(item, index) in property.additionalHousingTypes" 
+                      :key="index"
+                      class="flex items-center"
+                    >
+                      <svg class="h-5 w-5 text-indigo-500 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                      </svg>
+                      <span class="text-gray-600">
+                        {{ typeof item === 'string' ? item : item.type }}
+                        <span v-if="typeof item === 'object' && item.count" class="ml-1 text-purple-600">
+                          ({{ item.count }} unité{{ item.count > 1 ? 's' : '' }})
+                        </span>
+                      </span>
+                    </div>
+                  </template>
+                  
+                  <!-- Bedrooms -->
+                  <div v-if="property.bedrooms" class="flex items-center">
+                    <svg class="h-5 w-5 text-blue-500 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2H5a2 2 0 00-2-2z" />
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5a2 2 0 012-2h4a2 2 0 012 2v2H8V5z" />
+                    </svg>
+                    <span class="text-gray-600">{{ property.bedrooms }} {{ property.bedrooms === 'studio' ? '' : 'chambre(s)' }}</span>
+                  </div>
+                  
+                  <!-- Bathrooms -->
+                  <div v-if="property.bathrooms" class="flex items-center">
+                    <svg class="h-5 w-5 text-blue-500 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 14v3m4-3v3m4-3v3M3 21h18M3 10h18M3 7l9-4 9 4M4 10h16v11H4V10z" />
+                    </svg>
+                    <span class="text-gray-600">{{ property.bathrooms }} salle(s) de bain</span>
+                  </div>
+                  
+                  <!-- Transaction Type -->
+                  <div v-if="property.rentOrBuy" class="flex items-center">
+                    <svg class="h-5 w-5 text-purple-500 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1" />
+                    </svg>
+                    <span class="text-gray-600">
+                      <span v-if="property.rentOrBuy === 'rent'" class="text-green-600 font-medium">À louer</span>
+                      <span v-else-if="property.rentOrBuy === 'buy'" class="text-blue-600 font-medium">À vendre</span>
+                      <span v-else>{{ property.rentOrBuy }}</span>
+                    </span>
+                  </div>
+                  
+                  <!-- Delivery Date -->
                   <div class="flex items-center">
                     <svg class="h-5 w-5 text-green-500 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                     </svg>
                     <span class="text-gray-600">Livraison : {{ property.deliveryDate || 'Non spécifiée' }}</span>
                   </div>
+                  
+                  <!-- Created Date -->
                   <div class="flex items-center">
                     <svg class="h-5 w-5 text-green-500 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
                     <span class="text-gray-600">Publié le : {{ new Date(property.createdAt).toLocaleDateString('fr-FR') }}</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Payment Plan Section -->
+              <div v-if="property.paymentPlan" class="py-6 border-b border-gray-200">
+                <h2 class="text-lg font-medium text-gray-900 mb-4">Plan de paiement</h2>
+                
+                <!-- New Payment Plan Structure (Cash or Bank) -->
+                <div v-if="parsedPaymentPlan.paymentMethod && parsedPaymentPlan.paymentMethod !== 'legacy'" class="space-y-4">
+                  <div class="bg-gray-100 rounded-lg p-4 shadow-sm">
+                    <div class="text-sm font-medium text-gray-700 mb-2">
+                      Méthode de paiement: 
+                      <span class="font-bold text-purple-700 capitalize">{{ parsedPaymentPlan.paymentMethod === 'cash' ? 'Espèces' : 'Bancaire' }}</span>
+                    </div>
+                    
+                    <!-- Cash Payment -->
+                    <div v-if="parsedPaymentPlan.paymentMethod === 'cash' && parsedPaymentPlan.cashAmount" class="mt-3">
+                      <div class="text-2xl font-bold text-gray-900">{{ formatCurrency(parsedPaymentPlan.cashAmount) }}</div>
+                      <div class="text-sm text-gray-600 mt-1">Montant total en espèces</div>
+                    </div>
+                    
+                    <!-- Bank Payment -->
+                    <div v-if="parsedPaymentPlan.paymentMethod === 'bank'" class="mt-3 space-y-3">
+                      <div v-if="parsedPaymentPlan.bankFullAmount" class="border-b border-gray-300 pb-3">
+                        <div class="text-sm text-gray-600 mb-1">Montant total</div>
+                        <div class="text-xl font-bold text-gray-900">{{ formatCurrency(parsedPaymentPlan.bankFullAmount) }}</div>
+                      </div>
+                      <div v-if="parsedPaymentPlan.bankDownPayment">
+                        <div class="text-sm text-gray-600 mb-1">Acompte</div>
+                        <div class="text-xl font-bold text-purple-700">{{ formatCurrency(parsedPaymentPlan.bankDownPayment) }}</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                
+                <!-- Old Payment Plan Structure (Percentage-based) -->
+                <div v-else-if="parsedPaymentPlan.paymentMethod === 'legacy' || parsedPaymentPlan.downPayment" class="flex items-center justify-center space-x-2">
+                  <!-- Down Payment -->
+                  <div v-if="parsedPaymentPlan.downPayment" class="bg-gray-100 rounded-lg p-4 shadow-sm flex-1 max-w-xs">
+                    <div class="text-center">
+                      <div class="text-2xl font-bold text-gray-900 mb-1">{{ parsedPaymentPlan.downPayment }}%</div>
+                      <div class="text-sm font-medium text-gray-700 mb-1">Acompte</div>
+                      <div class="text-xs text-gray-500">Au lancement</div>
+                    </div>
+                  </div>
+                  
+                  <!-- Chevron Separator -->
+                  <div v-if="parsedPaymentPlan.downPayment && parsedPaymentPlan.duringConstruction" class="flex items-center">
+                    <svg class="h-6 w-6 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                    </svg>
+                  </div>
+                  
+                  <!-- During Construction -->
+                  <div v-if="parsedPaymentPlan.duringConstruction" class="bg-gray-100 rounded-lg p-4 shadow-sm flex-1 max-w-xs">
+                    <div class="text-center">
+                      <div class="text-2xl font-bold text-gray-900 mb-1">{{ parsedPaymentPlan.duringConstruction }}%</div>
+                      <div class="text-sm font-medium text-gray-700 mb-1">Pendant la construction</div>
+                      <div class="text-xs text-gray-500">Échelonnements</div>
+                    </div>
+                  </div>
+                  
+                  <!-- Chevron Separator -->
+                  <div v-if="parsedPaymentPlan.duringConstruction && parsedPaymentPlan.onHandover" class="flex items-center">
+                    <svg class="h-6 w-6 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                    </svg>
+                  </div>
+                  
+                  <!-- On Handover -->
+                  <div v-if="parsedPaymentPlan.onHandover" class="bg-gray-100 rounded-lg p-4 shadow-sm flex-1 max-w-xs">
+                    <div class="text-center">
+                      <div class="text-2xl font-bold text-gray-900 mb-1">{{ parsedPaymentPlan.onHandover }}%</div>
+                      <div class="text-sm font-medium text-gray-700">À la livraison</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Project Timeline Section -->
+              <div v-if="property.projectTimeline" class="py-6 border-b border-gray-200">
+                <h2 class="text-lg font-medium text-gray-900 mb-4">Project Timeline</h2>
+                <div class="bg-gray-100 rounded-lg p-6">
+                  <div class="relative">
+                    <!-- Timeline Line -->
+                    <div class="absolute left-6 top-0 bottom-0 w-0.5 bg-gray-300"></div>
+                    
+                    <!-- Project Announcement -->
+                    <div class="relative flex items-start mb-6">
+                      <div class="flex-shrink-0 w-12 h-12 rounded-full bg-blue-500 flex items-center justify-center mr-4">
+                        <svg class="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                        </svg>
+                      </div>
+                      <div class="flex-1">
+                        <h3 class="text-sm font-medium text-gray-900">Project announcement</h3>
+                        <div v-if="parsedTimeline.announcementDate" class="text-xs text-gray-500 mt-1">
+                          {{ formatDate(parsedTimeline.announcementDate) }}
+                        </div>
+                        <div v-else class="text-xs text-gray-500 mt-1">-</div>
+                      </div>
+                    </div>
+                    
+                    <!-- Construction Started -->
+                    <div class="relative flex items-start mb-6">
+                      <div class="flex-shrink-0 w-12 h-12 rounded-full flex items-center justify-center mr-4"
+                           :class="parsedTimeline.constructionStartDate ? 'bg-blue-500' : 'border-2 border-gray-300 bg-white'">
+                        <svg v-if="parsedTimeline.constructionStartDate" class="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                        </svg>
+                        <svg v-else class="w-6 h-6 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                      </div>
+                      <div class="flex-1">
+                        <h3 class="text-sm font-medium text-gray-900">Construction Started</h3>
+                        <div v-if="parsedTimeline.constructionStartDate" class="text-xs text-gray-500 mt-1">
+                          {{ formatDate(parsedTimeline.constructionStartDate) }}
+                        </div>
+                        <div v-else class="text-xs text-gray-500 mt-1">Not started</div>
+                      </div>
+                    </div>
+                    
+                    <!-- Expected Completion -->
+                    <div class="relative flex items-start">
+                      <div class="flex-shrink-0 w-12 h-12 rounded-full border-2 border-gray-300 bg-white flex items-center justify-center mr-4">
+                        <svg class="w-6 h-6 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                      </div>
+                      <div class="flex-1">
+                        <h3 class="text-sm font-medium text-gray-900">Expected Completion</h3>
+                        <div v-if="parsedTimeline.completionDate" class="text-xs text-gray-500 mt-1">
+                          {{ formatDate(parsedTimeline.completionDate) }}
+                        </div>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -296,12 +584,92 @@
           </div>
         </div>
       </div>
+      
+      <!-- Lightbox Modal -->
+      <div
+        v-if="lightboxOpen"
+        @click.self="closeLightbox"
+        class="fixed inset-0 z-50 bg-black/95 backdrop-blur-sm flex items-center justify-center p-4"
+        @keydown.esc="closeLightbox"
+        tabindex="-1"
+      >
+        <!-- Close Button -->
+        <button
+          @click="closeLightbox"
+          class="absolute top-4 right-4 text-white hover:text-gray-300 transition-colors z-50 p-2"
+          aria-label="Close lightbox"
+        >
+          <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+        
+        <!-- Image Counter -->
+        <div class="absolute top-4 left-1/2 -translate-x-1/2 text-white text-lg font-medium bg-black/50 px-4 py-2 rounded-full">
+          {{ currentImageIndex + 1 }} / {{ property.images.length }}
+        </div>
+        
+        <!-- Main Image -->
+        <div class="relative max-w-7xl max-h-[90vh] w-full h-full flex items-center justify-center">
+          <img
+            :src="currentImage"
+            :alt="`Property image ${currentImageIndex + 1}`"
+            class="max-w-full max-h-full object-contain"
+            @load="onImageLoad"
+          >
+          
+          <!-- Navigation Arrows -->
+          <button
+            v-if="property.images && property.images.length > 1"
+            @click.stop="previousImage"
+            class="absolute left-4 top-1/2 -translate-y-1/2 bg-white/20 hover:bg-white/30 backdrop-blur-sm text-white p-4 rounded-full transition-all duration-200"
+            aria-label="Previous image"
+          >
+            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+            </svg>
+          </button>
+          <button
+            v-if="property.images && property.images.length > 1"
+            @click.stop="nextImage"
+            class="absolute right-4 top-1/2 -translate-y-1/2 bg-white/20 hover:bg-white/30 backdrop-blur-sm text-white p-4 rounded-full transition-all duration-200"
+            aria-label="Next image"
+          >
+            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+            </svg>
+          </button>
+        </div>
+        
+        <!-- Thumbnail Strip -->
+        <div v-if="property.images && property.images.length > 1" class="absolute bottom-4 left-1/2 -translate-x-1/2 w-full max-w-4xl px-4">
+          <div class="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
+            <button
+              v-for="(img, index) in property.images"
+              :key="index"
+              @click="setCurrentImage(img, index)"
+              class="flex-shrink-0 w-20 h-20 rounded-lg overflow-hidden border-2 transition-all duration-200"
+              :class="{
+                'border-white': currentImageIndex === index,
+                'border-white/30 hover:border-white/60': currentImageIndex !== index
+              }"
+            >
+              <img
+                :src="getImageUrl(img)"
+                class="w-full h-full object-cover"
+                :alt="`Thumbnail ${index + 1}`"
+              >
+            </button>
+          </div>
+        </div>
+      </div>
     </div>
   </template>
   
   <script setup>
-  import { ref, onMounted, computed, watch } from 'vue';
+  import { ref, onMounted, onBeforeUnmount, computed, watch } from 'vue';
   import { useRoute, useRouter } from 'vue-router';
+  import axios from 'axios';
   import api from '../services/api';
   import Project from '../models/Project';
   
@@ -313,6 +681,8 @@
   const isLoading = ref(true);
   const error = ref(null);
   const currentImage = ref('');
+  const currentImageIndex = ref(0);
+  const lightboxOpen = ref(false);
   const imageLoaded = ref(false);
   const isSubmitting = ref(false);
   const submissionSuccess = ref(false);
@@ -340,9 +710,48 @@
   };
   
   // Set current image with proper URL handling
-  const setCurrentImage = (img) => {
+  const setCurrentImage = (img, index = null) => {
+    if (index !== null) {
+      currentImageIndex.value = index;
+    }
     currentImage.value = getImageUrl(img);
     imageLoaded.value = false;
+  };
+  
+  // Navigate to next image
+  const nextImage = () => {
+    if (!property.value?.images || property.value.images.length === 0) return;
+    const nextIndex = (currentImageIndex.value + 1) % property.value.images.length;
+    currentImageIndex.value = nextIndex;
+    setCurrentImage(property.value.images[nextIndex], nextIndex);
+  };
+  
+  // Navigate to previous image
+  const previousImage = () => {
+    if (!property.value?.images || property.value.images.length === 0) return;
+    const prevIndex = currentImageIndex.value === 0 
+      ? property.value.images.length - 1 
+      : currentImageIndex.value - 1;
+    currentImageIndex.value = prevIndex;
+    setCurrentImage(property.value.images[prevIndex], prevIndex);
+  };
+  
+  // Open lightbox
+  const openLightbox = (index = null) => {
+    if (index !== null) {
+      currentImageIndex.value = index;
+      setCurrentImage(property.value.images[index], index);
+    }
+    lightboxOpen.value = true;
+    // Prevent body scroll when lightbox is open
+    document.body.style.overflow = 'hidden';
+  };
+  
+  // Close lightbox
+  const closeLightbox = () => {
+    lightboxOpen.value = false;
+    // Restore body scroll
+    document.body.style.overflow = '';
   };
   
   // Fetch property data
@@ -388,19 +797,37 @@
         delivery_date: responseData.delivery_date,
         price: responseData.price,
         surface_area: responseData.surface_area,
+        bedrooms: responseData.bedrooms,
+        bathrooms: responseData.bathrooms,
+        rent_or_buy: responseData.rent_or_buy,
+        payment_plan: responseData.payment_plan,
+        project_timeline: responseData.project_timeline,
         description: responseData.description,
         created_at: responseData.created_at,
         updated_at: responseData.updated_at,
         // Handle images if they exist in the response
         images: Array.isArray(responseData.images) ? responseData.images : [],
         // Include user data if available
-        user: responseData.user || {}
+        user: responseData.user || {},
+        // Include F1-F4 counts and additional housing types
+        f1_count: responseData.f1_count || 0,
+        f2_count: responseData.f2_count || 0,
+        f3_count: responseData.f3_count || 0,
+        f4_count: responseData.f4_count || 0,
+        additional_housing_types: responseData.additional_housing_types || null
       };
       
       console.log('🔧 Formatted Data:', formattedData);
+      console.log('🔧 New Fields Check:', {
+        bedrooms: formattedData.bedrooms,
+        bathrooms: formattedData.bathrooms,
+        rent_or_buy: formattedData.rent_or_buy,
+        payment_plan: formattedData.payment_plan,
+        project_timeline: formattedData.project_timeline
+      });
       
-      // Validate required fields
-      const requiredFields = ['id', 'name', 'price', 'location'];
+      // Validate required fields (price is now optional)
+      const requiredFields = ['id', 'name', 'location'];
       const missingFields = requiredFields.filter(field => !formattedData[field]);
       
       if (missingFields.length > 0) {
@@ -411,15 +838,18 @@
         // Create a new Project instance with the formatted data
         property.value = new Project(formattedData);
         console.log('🏠 Successfully created Project instance:', property.value);
+        console.log('🏠 Project Properties Check:', {
+          bedrooms: property.value.bedrooms,
+          bathrooms: property.value.bathrooms,
+          rentOrBuy: property.value.rentOrBuy,
+          paymentPlan: property.value.paymentPlan,
+          projectTimeline: property.value.projectTimeline
+        });
         
         // Set the first image as current if available
         if (property.value.images && property.value.images.length > 0) {
+          currentImageIndex.value = 0;
           currentImage.value = getImageUrl(property.value.images[0]);
-        }
-        
-        // Set the first image as current if available
-        if (property.value.images && property.value.images.length > 0) {
-          currentImage.value = property.value.images[0].url || '';
           imageLoaded.value = false;
           console.log('🖼️ Set current image:', currentImage.value);
         }
@@ -464,16 +894,115 @@
   };
 
   // Format price in DZD with proper formatting
+  // Priority: payment plan amount (cash/bank) > regular price field
   const formattedPrice = computed(() => {
-    if (!property.value?.price) return 'N/A';
-    const numericValue = Number(String(property.value.price).replace(/[^0-9,.-]+/g, "").replace(',', '.'));
+    let amount = null;
+    
+    // First, check payment plan for cash or bank amount
+    if (parsedPaymentPlan.value.paymentMethod) {
+      if (parsedPaymentPlan.value.paymentMethod === 'cash' && parsedPaymentPlan.value.cashAmount) {
+        amount = parsedPaymentPlan.value.cashAmount;
+      } else if (parsedPaymentPlan.value.paymentMethod === 'bank' && parsedPaymentPlan.value.bankFullAmount) {
+        amount = parsedPaymentPlan.value.bankFullAmount;
+      }
+    }
+    
+    // Fall back to regular price field if no payment plan amount
+    if (!amount && property.value?.price) {
+      amount = property.value.price;
+    }
+    
+    // Format the amount
+    if (!amount) return 'N/A';
+    const numericValue = Number(String(amount).replace(/[^0-9,.-]+/g, "").replace(',', '.'));
     return `${numericValue.toLocaleString('ar-DZ')} DZD`;
   });
+  
+  // Format currency amount
+  const formatCurrency = (amount) => {
+    if (!amount) return 'N/A';
+    const numericValue = Number(amount);
+    return `${numericValue.toLocaleString('ar-DZ')} DZD`;
+  };
   
   // Format area using the Project model's method
   const formattedArea = computed(() => {
     return property.value?.formattedArea || '';
   });
+  
+  // Parse payment plan data (supports both old and new structure)
+  const parsedPaymentPlan = computed(() => {
+    if (!property.value?.paymentPlan) return {};
+    
+    try {
+      const paymentPlanData = typeof property.value.paymentPlan === 'string' 
+        ? JSON.parse(property.value.paymentPlan) 
+        : property.value.paymentPlan;
+      
+      // New structure: paymentMethod, cashAmount, bankFullAmount, bankDownPayment
+      if (paymentPlanData.paymentMethod) {
+        return {
+          paymentMethod: paymentPlanData.paymentMethod,
+          cashAmount: paymentPlanData.cashAmount || null,
+          bankFullAmount: paymentPlanData.bankFullAmount || null,
+          bankDownPayment: paymentPlanData.bankDownPayment || null
+        };
+      }
+      
+      // Old structure: downPayment, duringConstruction, onHandover (for backward compatibility)
+      if (paymentPlanData.downPayment !== undefined) {
+        return {
+          paymentMethod: 'legacy',
+          downPayment: paymentPlanData.downPayment || 0,
+          duringConstruction: paymentPlanData.duringConstruction || 0,
+          onHandover: paymentPlanData.onHandover || 0,
+          total: paymentPlanData.total || 0
+        };
+      }
+      
+      return {};
+    } catch (e) {
+      console.warn('Could not parse payment plan:', e);
+      return {};
+    }
+  });
+
+  // Parse project timeline data
+  const parsedTimeline = computed(() => {
+    if (!property.value?.projectTimeline) return {};
+    
+    try {
+      const timelineData = typeof property.value.projectTimeline === 'string' 
+        ? JSON.parse(property.value.projectTimeline) 
+        : property.value.projectTimeline;
+      
+      return {
+        announcement: timelineData.announcement || '',
+        announcementDate: timelineData.announcementDate || '',
+        construction: timelineData.construction || '',
+        constructionStartDate: timelineData.constructionStartDate || '',
+        completionDate: timelineData.completionDate || ''
+      };
+    } catch (e) {
+      console.warn('Could not parse project_timeline:', e);
+      return {};
+    }
+  });
+
+  // Format date function
+  const formatDate = (dateString) => {
+    if (!dateString) return '';
+    try {
+      const date = new Date(dateString);
+      return date.toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+      });
+    } catch (e) {
+      return dateString;
+    }
+  };
   
   // Handle image loading
   const onImageLoad = () => {
@@ -486,6 +1015,21 @@
       fetchProperty();
     }
   });
+  
+  // Handle keyboard navigation in lightbox
+  const handleKeyDown = (e) => {
+    if (!lightboxOpen.value) return;
+    if (e.key === 'ArrowLeft') {
+      e.preventDefault();
+      previousImage();
+    } else if (e.key === 'ArrowRight') {
+      e.preventDefault();
+      nextImage();
+    } else if (e.key === 'Escape') {
+      e.preventDefault();
+      closeLightbox();
+    }
+  };
   
   // Handle form submission
   const submitInquiry = async () => {
@@ -554,10 +1098,33 @@
       error.value = 'No property ID provided';
       isLoading.value = false;
     }
+    // Add keyboard listener for lightbox navigation
+    window.addEventListener('keydown', handleKeyDown);
+  });
+  
+  // Cleanup on unmount
+  onBeforeUnmount(() => {
+    window.removeEventListener('keydown', handleKeyDown);
+    // Restore body scroll if lightbox was open
+    document.body.style.overflow = '';
   });
   </script>
   
   <style scoped>
-  /* Custom styles if needed */
+  /* Hide scrollbar for thumbnail strip */
+  .scrollbar-hide {
+    -ms-overflow-style: none;  /* IE and Edge */
+    scrollbar-width: none;  /* Firefox */
+  }
+  
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;  /* Chrome, Safari and Opera */
+  }
+  
+  /* Smooth transitions for images */
+  img {
+    image-rendering: -webkit-optimize-contrast;
+    image-rendering: crisp-edges;
+  }
   </style>
   

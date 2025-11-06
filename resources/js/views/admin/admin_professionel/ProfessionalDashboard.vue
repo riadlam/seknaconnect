@@ -117,7 +117,7 @@ Tableau de bord
                   </p>
                   <p class="mt-2 flex items-center text-sm text-gray-500 sm:mt-0 sm:ml-6">
                     <component :is="getIconComponent('MapPinIcon')" class="mr-1.5 h-5 w-5 flex-shrink-0 text-gray-400" />
-                    {{ project.location || 'Localisation non spécifiée' }}
+                    {{ formatLocation(project.location) }}
                   </p>
                 </div>
                 <div class="mt-2 flex items-center text-sm text-gray-500 sm:mt-0">
@@ -150,6 +150,7 @@ Tableau de bord
 <script setup>
 import { ref, onMounted, computed } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
+import { useStore } from 'vuex';
 import { 
   HomeModernIcon,
   UserGroupIcon,
@@ -162,9 +163,15 @@ import axios from 'axios';
 
 const route = useRoute();
 const router = useRouter();
+const store = useStore();
 const projects = ref([]);
+const inquiries = ref([]);
 const loading = ref(true);
 const error = ref(null);
+
+// Get current user and check if admin
+const currentUser = computed(() => store.getters['auth/currentUser']);
+const isAdmin = computed(() => currentUser.value?.role === 'admin');
 
 // Fetch projects from API
 const fetchProjects = async () => {
@@ -182,6 +189,22 @@ const fetchProjects = async () => {
     error.value = 'Échec du chargement des projets. Veuillez réessayer plus tard.';
   } finally {
     loading.value = false;
+  }
+};
+
+// Fetch inquiries from API (for non-admin users)
+const fetchInquiries = async () => {
+  try {
+    const response = await axios.get('/api/professional/inquiries', {
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
+      }
+    });
+    inquiries.value = response.data || [];
+  } catch (err) {
+    console.error('Error fetching inquiries:', err);
+    inquiries.value = [];
   }
 };
 
@@ -222,11 +245,53 @@ const formatStatus = (status) => {
     .join(' ');
 };
 
+// Format location object/string into readable text
+const formatLocation = (location) => {
+  if (!location) return 'Localisation non spécifiée';
+  
+  try {
+    // If it's already a string, try to parse it as JSON
+    const locationObj = typeof location === 'string' ? JSON.parse(location) : location;
+    
+    // Extract address components (check for different possible field names)
+    const parts = [];
+    
+    // Check for address/street
+    if (locationObj.address) parts.push(locationObj.address);
+    if (locationObj.street) parts.push(locationObj.street);
+    
+    // Check for commune/baladia
+    if (locationObj.commune) parts.push(locationObj.commune);
+    if (locationObj.baladia) parts.push(locationObj.baladia);
+    
+    // Check for daira
+    if (locationObj.daira) {
+      // Only add daira if it's different from commune/baladia
+      if (locationObj.daira !== locationObj.commune && locationObj.daira !== locationObj.baladia) {
+        parts.push(locationObj.daira);
+      }
+    }
+    
+    // Check for wilaya
+    if (locationObj.wilaya) parts.push(locationObj.wilaya);
+    
+    // Return formatted location or fallback
+    return parts.length > 0 ? parts.join(', ') : (typeof location === 'string' ? location : 'Localisation non spécifiée');
+  } catch (e) {
+    // If parsing fails, return as string or default message
+    return typeof location === 'string' ? location : 'Localisation non spécifiée';
+  }
+};
+
 // Stats data - now computed based on actual projects
 const stats = computed(() => {
   const totalProjects = projects.value.length;
   const activeProjects = projects.value.filter(p => p.status === 'active').length;
-  const totalClients = 4;
+  
+  // For admin users, show total clients; for non-admin users, show total inquiries
+  const totalClients = isAdmin.value ? 4 : inquiries.value.length;
+  const clientsLabel = isAdmin.value ? 'Clients Totaux' : 'Demandes Totales';
+  
   const totalRevenue = projects.value.reduce((sum, project) => {
     return sum + parseFloat(project.price || 0);
   }, 0);
@@ -245,7 +310,7 @@ const stats = computed(() => {
     //   iconBackground: 'rounded-md bg-green-500 p-3' 
     // },
     { 
-      name: 'Clients Totaux', 
+      name: clientsLabel, 
       value: totalClients.toString(), 
       icon: 'UserGroupIcon', 
       iconBackground: 'rounded-md bg-blue-500 p-3' 
@@ -268,16 +333,21 @@ const recentProjects = computed(() => {
       id: project.id,
       name: project.name,
       type: project.housing_type,
-      location: project.location,
+      location: formatLocation(project.location),
       date: formatDate(project.created_at),
       status: formatStatus(project.status || 'completed'),
-      statusColor: getStatusColor(project.status || 'completed')
+      statusColor: getStatusColor(project.status || 'completed'),
+      images: project.images || []
     }));
 });
 
 // Fetch projects when component is mounted
 onMounted(() => {
   fetchProjects();
+  // Fetch inquiries if user is not admin
+  if (!isAdmin.value) {
+    fetchInquiries();
+  }
 });
 
 // Dynamic component for icons

@@ -46,7 +46,6 @@ Chargement des projets...
                   <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Type</th>
                   <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Localisation</th>
                   <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Prix</th>
-                  <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Unités</th>
                   <th scope="col" class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900">Livraison</th>
                   <th scope="col" class="relative py-3.5 pl-3 pr-4 sm:pr-6">
                     <span class="sr-only">Actions</span>
@@ -72,13 +71,10 @@ Chargement des projets...
                     </span>
                   </td>
                   <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                    {{ project.location }}
+                    {{ formatLocation(project.location) }}
                   </td>
                   <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                    {{ formatPrice(project.price) }}
-                  </td>
-                  <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                    {{ project.num_units }}
+                    {{ project ? formatPrice(getProjectPrice(project)) : 'N/D' }}
                   </td>
                   <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
                     {{ formatDate(project.delivery_date) }}
@@ -98,20 +94,47 @@ Chargement des projets...
 
 <script setup>
 import { ref, onMounted } from 'vue';
+import { useRouter } from 'vue-router';
 import axios from 'axios';
 
+const router = useRouter();
 const projects = ref([]);
 const loading = ref(true);
 const error = ref(null);
 
+// Helper function to get price from payment plan or regular price field
+const getProjectPrice = (project) => {
+  // First, check payment plan for cash or bank amount
+  if (project.payment_plan) {
+    try {
+      const paymentPlanData = typeof project.payment_plan === 'string' 
+        ? JSON.parse(project.payment_plan) 
+        : project.payment_plan;
+      
+      if (paymentPlanData.paymentMethod === 'cash' && paymentPlanData.cashAmount) {
+        return paymentPlanData.cashAmount;
+      } else if (paymentPlanData.paymentMethod === 'bank' && paymentPlanData.bankFullAmount) {
+        return paymentPlanData.bankFullAmount;
+      }
+    } catch (e) {
+      console.warn('Could not parse payment plan:', e);
+    }
+  }
+  
+  // Fall back to regular price field
+  return project.price || null;
+};
+
 // Format price with thousands separator in DZD
 const formatPrice = (price) => {
-  if (!price) return 'N/D';
+  if (!price && price !== 0) return 'N/D';
+  const numericValue = Number(price);
+  if (isNaN(numericValue)) return 'N/D';
   return new Intl.NumberFormat('ar-DZ', {
     style: 'decimal',
     minimumFractionDigits: 2,
     maximumFractionDigits: 2
-  }).format(price) + ' DZD';
+  }).format(numericValue) + ' DZD';
 };
 
 // Format date
@@ -121,10 +144,49 @@ const formatDate = (dateString) => {
   return new Date(dateString).toLocaleDateString(undefined, options);
 };
 
-// View project details
+// Format location object/string into readable text
+const formatLocation = (location) => {
+  if (!location) return 'N/D';
+  
+  try {
+    // If it's already a string, try to parse it as JSON
+    const locationObj = typeof location === 'string' ? JSON.parse(location) : location;
+    
+    // Extract address components (check for different possible field names)
+    const parts = [];
+    
+    // Check for address/street
+    if (locationObj.address) parts.push(locationObj.address);
+    if (locationObj.street) parts.push(locationObj.street);
+    
+    // Check for commune/baladia
+    if (locationObj.commune) parts.push(locationObj.commune);
+    if (locationObj.baladia) parts.push(locationObj.baladia);
+    
+    // Check for daira
+    if (locationObj.daira) {
+      // Only add daira if it's different from commune/baladia
+      if (locationObj.daira !== locationObj.commune && locationObj.daira !== locationObj.baladia) {
+        parts.push(locationObj.daira);
+      }
+    }
+    
+    // Check for wilaya
+    if (locationObj.wilaya) parts.push(locationObj.wilaya);
+    
+    // Return formatted location or fallback
+    return parts.length > 0 ? parts.join(', ') : (typeof location === 'string' ? location : 'N/D');
+  } catch (e) {
+    // If parsing fails, return as string or N/D
+    return typeof location === 'string' ? location : 'N/D';
+  }
+};
+
+// View project details - navigate to property details page
 const viewProject = (project) => {
-  // TODO: Implement view project details
-  console.log('View project:', project);
+  if (project && project.id) {
+    router.push({ name: 'property-details', params: { id: project.id } });
+  }
 };
 
 // Edit project
@@ -146,10 +208,12 @@ const fetchProjects = async () => {
       }
     });
     
-    projects.value = response.data;
+    // Handle both direct array response and wrapped response
+    projects.value = Array.isArray(response.data) ? response.data : (response.data.data || response.data.projects || []);
   } catch (err) {
     console.error('Error fetching projects:', err);
     error.value = 'Échec du chargement des projets. Veuillez réessayer plus tard.';
+    projects.value = [];
   } finally {
     loading.value = false;
   }
