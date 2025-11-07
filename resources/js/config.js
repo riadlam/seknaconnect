@@ -1,7 +1,7 @@
 export default {
   // API Configuration
   api: {
-    baseURL: 'http://sekna.soexplast.com/api',
+    baseURL: 'https://sekna.soexplast.com/api',
     timeout: 10000, // 10 seconds
     endpoints: {
       projects: '/projects',
