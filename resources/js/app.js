@@ -18,7 +18,7 @@ import InquiriesList from './views/admin/admin_professionel/InquiriesList.vue';
 import UsersList from './views/admin/admin_professionel/UsersList.vue';
 
 // Set base URL for API requests
-axios.defaults.baseURL = 'http://sekna.soexplast.com';
+axios.defaults.baseURL = 'https://sekna.soexplast.com';
 
 // Add a request interceptor to include the token in all requests
 axios.interceptors.request.use(

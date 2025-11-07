@@ -538,7 +538,7 @@ import axios from 'axios';
 
 // Create axios instance for direct API calls
 const axiosInstance = axios.create({
-  baseURL: 'http://sekna.soexplast.com',
+  baseURL: 'https://sekna.soexplast.com',
   headers: {
     'Accept': 'application/json',
     'Content-Type': 'application/json',
@@ -892,7 +892,7 @@ const fetchProperties = async () => {
         housing_type: project.housing_type,
         images: (project.images || []).map(img => ({
           id: img.id,
-          url: img.image_path && img.image_path.startsWith('http') ? img.image_path : `http://sekna.soexplast.com${img.image_path}`,
+          url: img.image_path && img.image_path.startsWith('http') ? img.image_path : `https://sekna.soexplast.com${img.image_path}`,
           image_path: img.image_path,
           caption: img.caption
         })),
